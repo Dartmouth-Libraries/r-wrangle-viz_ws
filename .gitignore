@@ -1,4 +1,5 @@
 .Rproj
+renv/
 
 #Katie's addition to Jeremy's additions
 00_workshop_prep/Scratch_KOB.R

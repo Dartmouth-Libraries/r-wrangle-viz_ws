@@ -1,0 +1,28 @@
+---
+title: "datasets_details"
+output: html_document
+---
+
+## dataset "..clean.csv"
+  + input = multiple csvs in data/raw
+  + nb = "00_data_merge_clean.r"
+  + removes rankings from titles, i.e. "1. Star Wars" becomes "Star Wars"
+  + converts time durations into minutes, i.e. "2h 22m" to "142" 
+  + renames some columns
+
+## dataset "..clean_subset.csv"
+  + input = "..clean.csv"
+  + nb = "00_data_merge_clean.r"
+  + removes some columns
+
+  
+## dataset "..clean2.csv" 
+  + input = "..clean_subset.csv"
+  + nb = "clean_currency_and_dates.qmd"
+  + splits `budget` and `gross_worldwide` columns into 3 separate columns for each: value, currency, and presence of word "(estimated)"
+  + splits `release_date` column into year, month, day, and daynum columns
+  
+## dateset "..clean2_dollars.csv"
+  + input = "clean2.csv"
+  + filters dataset so only those where columns `budget_currency` and `grossww_currency` == "$" remain; reduces 2010-2025 dff from 9600 obs's to 2969.
+  
