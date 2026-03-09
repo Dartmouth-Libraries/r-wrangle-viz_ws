@@ -1,3 +1,7 @@
+
+#Katie's addition to Jeremy's additions
+00_workshop_prep/Scratch_KOB.R
+
 #Jeremy's addition's to Github .gitignore R template
 .Rprofile
 hidden-*/
@@ -42,9 +46,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
-
-# pkgdown site
-docs/
 
 # translation temp files
 po/*~
