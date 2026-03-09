@@ -46,7 +46,15 @@ movies_cleaned <- movies_cleaned |>
 
 movies_cleaned <- movies_cleaned |>
   rename(gross_worldwide = grossWorldWWide,
-         gross_opening_wknd = opening_weekend_Gross)
+         gross_opening_wknd = opening_weekend_Gross,
+         meta_score = méta_score)
+
+## Budget ----
+
+# Remove everything not in USD ($ at front of string) & the (estimated) part of the string
+# Keep missing entries 
+
+## write up the full clean data ---
   
 write.csv(movies_cleaned,"data/movie_data_2010-2015_clean.csv", row.names = FALSE)
 
@@ -61,6 +69,7 @@ movies_subset <- movies_cleaned |>
          duration_minutes,
          MPA,
          Rating,
+         meta_score,
          directors,
          stars,
          budget,
@@ -89,3 +98,4 @@ write.csv(movies_subset,"data/movie_data_2010-2015_clean_subset.csv", row.names 
 # Possible question ideas ----
 ## Something about when in the year a movie opens and revenue?
 ## Awards column - create a "did it win an Oscar?" variable?
+## public vs critic opinion (meta-score)?
