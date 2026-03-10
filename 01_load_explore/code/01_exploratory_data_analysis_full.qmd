@@ -1,0 +1,179 @@
+---
+title: "Session 1: Load and explore movie data"
+author: "Emily Myers"
+date: 03/23/2026
+format: html
+editor: visual
+---
+
+Throughout this workshop series, we are trying to answer two questions using a data set on movies:
+
+-   **A:** (How) do critical and popular opinion about movies diverge?
+
+-   **B:** What genre of movies has the most bang for its buck (lowest budget, highest revenue?)
+
+Before we can answer those questions, we need to explore our data!
+
+# Load packages and data
+
+## (Install) and load packages
+
+Packages are groups of commands/functions that you can run in R. Each package has documentation in the “help” section of R (bottom right quadrant) and on CRAN.
+
+We will use two packages:
+
+`tidyverse` (actually a group of packages!) commonly used for data cleaning, plotting, etc.
+
+`here` tells R which project folder to work in
+
+If you have used these packages before, you do not need to re-install them (hint: look in the "packages" tab of the bottom right quadrant of R studio- if they show up when you search, they are installed!). If this is your first time using these packages, you need to install them in this code chunk:
+
+```{r}
+install.packages("tidyverse")
+install.packages("here")
+```
+
+Regardless of whether or not you needed to install these packages, you will need to load them to use them in this session:
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+### Load data
+
+Now, we need to load our data into our global environment.
+
+```{r}
+movies <- read.csv(here("data", "movie_data_2010-2025_clean2_dollars.csv"))
+
+```
+
+# Explore data
+
+Now that we've loaded our data, we can start exploring it! We'll start by looking at the structure and content of our data, and then dive into a more granular exploration of the variables most relevant to our questions. Our goals are two-fold:
+
+1.  Identify necessary cleaning and wrangling steps
+2.  Figure out if our data is suited to answer our questions
+
+## Examine structure and content of the data
+
+### Print the first few rows
+
+```{r}
+head(movies)
+```
+
+### Get the column names
+
+```{r}
+colnames(movies)
+```
+
+### Examine variable types
+
+```{r}
+lapply(movies, class)
+```
+
+### Accomplish all of this with one command!
+
+```{r}
+str(movies)
+```
+
+### Look for NAs in each column
+
+```{r}
+movies |>
+  summarize(across(everything(), ~ sum(is.na(.))))
+```
+
+There are a lot of NAs in `meta_score`, `MPA`, and `awards_content`!
+
+## Dig into most relevant variables
+
+### Get summary statistics for all numeric variables
+
+```{r}
+summary(movies)
+```
+
+### Get summary statistics for variables relevant to question A (Rating, meta_score) budget_value, grossww_value
+
+```{r}
+summary(movies[, c("Rating", "meta_score")])
+```
+
+### Get summary statistics for variables relevant to question B (budget_value, grossww_value)
+
+```{r}
+summary(movies[, c("budget_value", "gross_ww_value")])
+
+```
+
+### Examine genres variable
+
+How should we explore genres (also relevant to question B), since it isn't a numeric variable?
+
+```{r}
+# how many unique values?
+length(unique(movies$genres))
+# frequency of the top 20 genres
+movies %>% count(genres, sort = TRUE) %>% slice_head(n = 20)
+```
+
+## Create simple visualizations of key variables
+
+Here, we are using base R and making very simple plots. Later, you’ll learn how to make customizable (aka pretty) visualizations using `ggplot`.
+
+### Histogram of Rating
+
+```{r}
+hist(movies$Rating)
+```
+
+### Histogram of meta_score
+
+```{r}
+hist(movies$meta_score)
+```
+
+### Histogram of budget_value
+
+```{r}
+hist(movies$budget_value)
+```
+
+Scientific notation makes things hard to interpret! Let's fix that and try again:
+
+```{r}
+options(scipen = 999)
+hist(movies$budget_value)
+```
+
+### Histogram of grossww_value
+
+```{r}
+hist(movies$grossww_value)
+```
+
+# What did we learn about our data?
+
+## What cleaning steps might we need to take?
+
+-   standardize column names
+
+-   clean/wrangle the genres variable
+
+-   clean the budget column- should there be a movie with a \$1 budget?
+
+-   make the budget and gross value variables more manageable
+
+## Can we answer our questions with the data as is?
+
+-   we have some NAs in meta score: for question A, we'll need to filter out rows with NA n meta score
+
+-   we need a variable that measures "bang for buck"
+
+-   the genres variable is not workable as is!
