@@ -8,7 +8,7 @@ editor: visual
 
 Throughout this workshop series, we are trying to answer two questions using a data set on movies:
 
--   **A:** (How) do critical and popular opinion about movies diverge?
+-   **A:** (How) do critical and popular opinions about movies diverge?
 
 -   **B:** What genre of movies has the most bang for its buck (lowest budget, highest revenue?)
 
@@ -45,7 +45,7 @@ library(here)
 Now, we need to load our data into our global environment.
 
 ```{r}
-movies <- read.csv(here("data", "movie_data_2010-2025_clean2_dollars.csv"))
+movies <- read.csv(here("data", "movie_data_2010-2025_clean_dollars.csv"))
 
 ```
 
@@ -89,7 +89,7 @@ movies |>
   summarize(across(everything(), ~ sum(is.na(.))))
 ```
 
-There are a lot of NAs in `meta_score`, `MPA`, and `awards_content`!
+There are a lot of NAs in `meta_score`!
 
 ## Dig into most relevant variables
 
@@ -108,7 +108,7 @@ summary(movies[, c("Rating", "meta_score")])
 ### Get summary statistics for variables relevant to question B (budget_value, grossww_value)
 
 ```{r}
-summary(movies[, c("budget_value", "gross_ww_value")])
+summary(movies[, c("budget_value", "grossww_value")])
 
 ```
 

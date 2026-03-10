@@ -8,7 +8,7 @@ editor: visual
 
 Throughout this workshop series, we are trying to answer two questions using a data set on movies:
 
--   **A:** (How) do critical and popular opinion about movies diverge?
+-   **A:** (How) do critical and popular opinions about movies diverge?
 
 -   **B:** What genre of movies has the most bang for its buck (lowest budget, highest revenue?)
 
@@ -143,7 +143,7 @@ Scientific notation makes things hard to interpret! Let's fix that and try again
 
 ```
 
-### Histogram of grossww_value 
+### Histogram of grossww_value
 
 ```{r}
 
