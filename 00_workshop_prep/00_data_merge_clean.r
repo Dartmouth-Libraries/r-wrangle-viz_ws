@@ -54,41 +54,104 @@ movies_cleaned <- movies_cleaned |>
 # Remove everything not in USD ($ at front of string) & the (estimated) part of the string
 # Keep missing entries 
 
+### optional - extract and review all non-number sequences of characters in budget column
+tokens <- movies_cleaned |> 
+  pull(budget) |>
+  str_extract_all("[^0-9,. ]+") |>
+  unlist() |>
+  tibble(token = _) |>
+  count(token, sort = TRUE)
+
+### extract non-numbers from budget column
+### if "(estimated)" set `budget_estimated` = TRUE
+### other non-number text is placed into `budget_currency`
+movies_cleaned <- movies_cleaned |>
+  mutate(
+    budget_estimated = str_detect(budget, fixed("(estimated)")),
+    budget_value = budget |>
+      str_remove_all("[^0-9.]") |>
+      as.numeric(),
+    budget_currency = budget |>
+      str_extract("[^0-9,. (estimated)]+") |>
+      str_trim()
+  )
+
+### do the same thing with gross_worldwide column
+movies_cleaned <- movies_cleaned |>
+  mutate(
+    grossww_value = gross_worldwide |>
+      str_remove_all("[^0-9.]") |>
+      as.numeric(),
+    # grossw_estimate = str_detect(gross_worldwide, fixed("(estimated)")),
+    grossww_currency = gross_worldwide |>
+      str_extract("[^0-9,. (estimated)]+") |>
+      str_trim()
+  )
+
+## Split date column
+### will produce warning about some dates failing to parse
+### coalesce fills incomplete date values with "01-01"
+### date_partial = TRUE to flag these cases
+movies_cleaned <- movies_cleaned |>
+  mutate(
+    # parse "June 18, 2010" → proper Date object
+    date   = mdy(release_date) |> coalesce(ymd(str_c(release_date, "-01-01"))),
+    year   = year(date),
+    month  = month(date),
+    day    = day(date),
+    daynum = yday(date),      # day of year, 1–366
+    date_partial  = is.na(mdy(release_date)) & !is.na(date),  # TRUE = year-only entry
+  )
+
 ## write up the full clean data ---
   
-write.csv(movies_cleaned,"data/movie_data_2010-2015_clean.csv", row.names = FALSE)
+write.csv(movies_cleaned,"data/movie_data_2010-2025_clean.csv", row.names = FALSE)
+
+colnames(movies_cleaned)
+
 
 
 # Subset to fewer columns ----
 
-## Exclude: Votes,"méta_score" ,"description","Movie.Link","writers","countries_origin","filming_locations","production_company"  
+## Exclude: Votes,"description","Movie.Link","writers","countries_origin","filming_locations","production_company"  
 
 movies_subset <- movies_cleaned |>
-  select(Title, 
-         Year, 
+  select(Title,
+         # Year, 
          duration_minutes,
          MPA,
          Rating,
          meta_score,
+         genres,
+         date,
+         year,
+         month,
+         day,
+         daynum,
+         date_partial,
+         # budget,
+         # gross_opening_wknd,
+         # gross_worldwide,
+         # gross_US_Canada,
+         # release_date,
+         budget_estimated,
+         budget_value,
+         budget_currency,
+         grossww_value,
+         grossww_currency,
          directors,
          stars,
-         budget,
-         gross_opening_wknd,
-         gross_worldwide,
-         gross_US_Canada,
-         release_date,
          awards_content,
-         genres,
          Languages
          )
 
 
-write.csv(movies_subset,"data/movie_data_2010-2015_clean_subset.csv", row.names = FALSE)
+write.csv(movies_subset,"data/movie_data_2010-2025_clean_subset.csv", row.names = FALSE)
 
 # Additional EDA findings to clean during session? ----
 ## All variables but Year, Rating, and méta_score are chr
-## "(estimated)" in budget column
-## Budget column has different currencies (eg, euro and other currency symbols,"CA$10,000) <- maybe subset to 
+## [x] "(estimated)" in budget column
+## [x] Budget column has different currencies (eg, euro and other currency symbols,"CA$10,000) <- maybe subset to 
       ## only those with a $ to start the string (i.e. US films with budget data)?
 ## Column names have varied naming patterns
 ## Lots of missing data, especially note in financial columns (eg in 2010, half the films don't have budget)
