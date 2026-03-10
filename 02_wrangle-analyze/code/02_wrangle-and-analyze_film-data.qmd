@@ -7,7 +7,6 @@ editor: visual
 
 ```{r}
 library(tidyverse)
-
 ```
 
 ```{r}
@@ -116,8 +115,7 @@ genre_aggreg |>
   filter (n>=20)
 ```
 
-**Add spread to the summary**
-Median alone doesn't capture risk. A genre with high median ROI but huge variance is a very different bet than one with moderate but consistent returns:
+**Add spread to the summary** Median alone doesn't capture risk. A genre with high median ROI but huge variance is a very different bet than one with moderate but consistent returns:
 
 ```{r}
 genre_df |>
