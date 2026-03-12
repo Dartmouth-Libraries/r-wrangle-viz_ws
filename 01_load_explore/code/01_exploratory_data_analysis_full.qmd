@@ -6,7 +6,7 @@ format: html
 editor: visual
 ---
 
-Throughout this workshop series, we are trying to answer two questions using a data set on movies:
+Throughout this workshop series, we are trying to answer two questions using a dataset on movies:
 
 -   **A:** (How) do critical and popular opinions about movies diverge?
 
@@ -172,7 +172,7 @@ hist(movies$grossww_value)
 
 ## Can we answer our questions with the data as is?
 
--   we have some NAs in meta score: for question A, we'll need to filter out rows with NA n meta score
+-   we have some NAs in meta score: for question A, we'll need to filter out rows with NA in meta score
 
 -   we need a variable that measures "bang for buck"
 
