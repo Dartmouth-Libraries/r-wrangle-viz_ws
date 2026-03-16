@@ -103,16 +103,16 @@ Political Documentary,-15.48542,2,documentary
 Political Drama,75.40931944444445,21,drama
 Political Thriller,160.77055469757335,20,thriller
 Pop Musical,122.160244,21,musical
-Prison Drama,-79.605492,7,
-Psychological Drama,124.82883666666666,75,
-Psychological Horror,295.18368636363635,54,
-Psychological Thriller,121.17730202898551,94,
-Quest,138.22384882352944,65,
-Quirky Comedy,290.42083875000003,23,
-Raunchy Comedy,263.8742462912621,36,
-Road Trip,186.15394909090907,36,
-Rock Musical,388.301,1,
-Romance,63.705727272727266,485,
+Prison Drama,-79.605492,7,drama
+Psychological Drama,124.82883666666666,75,drama
+Psychological Horror,295.18368636363635,54,horror
+Psychological Thriller,121.17730202898551,94,thriller
+Quest,138.22384882352944,65,act-ad
+Quirky Comedy,290.42083875000003,23,comedy
+Raunchy Comedy,263.8742462912621,36,comedy
+Road Trip,186.15394909090907,36,act-ad
+Rock Musical,388.301,1,musical
+Romance,63.705727272727266,485,romance
 Romantic Comedy,168.6819888,81,
 Romantic Epic,29.221711382352936,6,
 Samurai,211.4843,5,

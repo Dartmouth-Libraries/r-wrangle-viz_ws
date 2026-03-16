@@ -24,6 +24,10 @@ head(df)
 
 Opener and Closer - referring back to big research questions
 
+change filename - remove years and remove clean from the title of the file
+
+parent genres
+
 ## Standardize Variable Names
 
 ## Clean / Wrangle Scores
@@ -141,6 +145,8 @@ genre_aggreg |>
 ```{r}
 genre_aggreg_alpha <- genre_aggreg |>
   arrange(genre)
+
+write_csv(genre_aggreg_alpha, "../../results/genre_list.csv")
 
 ```
 
