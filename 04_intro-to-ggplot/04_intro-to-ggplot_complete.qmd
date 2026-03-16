@@ -1,0 +1,93 @@
+---
+title: "Intro to GGplot"
+author: "Jeremy Mikecz"
+format: html
+editor: visual
+---
+
+## 
+
+## 0. Setup
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+## 1. Import Data
+
+Now let's import this dataset:
+
+```{r}
+movies <- read.csv(here("data", "movie_data_2010-2025_clean_dollars.csv"))
+```
+
+```{r}
+print(dim(movies))
+movies <- movies |>
+  mutate(
+    budget_mm = budget_value / 1000000,
+    grossww_mm = grossww_value / 1000000
+  ) |>
+  filter(budget_value >= 1000)
+print(dim(movies))
+```
+
+## 2. First Plot: two variables
+
+### 2a. Basic plot
+
+Let's first create a scatterplot of this dataset for one year (1982) and two variables (`lifeExp` = life expectancy and `gdpPercap` = gdpPercap).
+
+```{r}
+```
+
+```{r}
+# let's store the year we want to examine in variable 
+# so we can easily change it later
+ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point()
+```
+
+### 2b. Adjust color & transparency (as constants)
+
+[ggplot colors](https://sape.inf.usi.ch/quick-reference/ggplot2/colour)
+
+```{r}
+ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point(color="steelblue4", alpha = 0.3, size=3)
+```
+
+### 2c. Add a smoothed line
+
+```{r}
+p <- ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point(color="steelblue4", alpha = 0.3, size=3) +
+  geom_smooth(color="purple")                      # , method='lm', se=False
+
+p
+```
+
+### 2 - Extra: examine distributions more closely
+
+```{r}
+#install.packages("ggExtra")
+library(ggExtra)
+
+ggMarginal(p, type='histogram')
+
+```
+
+## Dealing with Small Budget Movies: Rescale Data
+
+```{r}
+library(scales)
+log_p <- ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point(color="steelblue4", alpha = 0.3, size=3) +
+  geom_smooth(color="purple") +
+  scale_x_log10(labels = label_dollar(suffix = "M")) +
+  scale_y_log10(labels = label_dollar(suffix = "M")) +
+  annotation_logticks()
+  
+log_p
+```
