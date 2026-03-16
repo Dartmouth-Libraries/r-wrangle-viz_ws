@@ -136,6 +136,14 @@ genre_aggreg |>
   filter (n>=20)
 ```
 
+**Export list of genres with ROI and n**
+
+```{r}
+genre_aggreg_alpha <- genre_aggreg |>
+  arrange(genre)
+
+```
+
 **Add spread to the summary** Median alone doesn't capture risk. A genre with high median ROI but huge variance is a very different bet than one with moderate but consistent returns:
 
 ```{r}
