@@ -153,7 +153,7 @@ write.csv(movies_subset,"data/movie_data_2010-2025_clean_subset.csv", row.names 
 movies_subset_dollars <- movies_subset |>
   filter(budget_currency == "$" & grossww_currency == "$")
 
-write_csv(movies_subset_dollars, "../data/movie_data_2010-2025_clean_dollars.csv")
+write_csv(movies_subset_dollars, "data/movie_data_2010-2025_clean_dollars.csv")
 
 # Additional EDA findings to clean during session? ----
 ## All variables but Year, Rating, and méta_score are chr
