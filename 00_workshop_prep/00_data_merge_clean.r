@@ -49,6 +49,8 @@ movies_cleaned <- movies_cleaned |>
          gross_opening_wknd = opening_weekend_Gross,
          meta_score = méta_score)
 
+
+
 ## Budget ----
 
 # Remove everything not in USD ($ at front of string) & the (estimated) part of the string
@@ -105,7 +107,7 @@ movies_cleaned <- movies_cleaned |>
 
 ## write up the full clean data ---
   
-write.csv(movies_cleaned,"data/movie_data_2010-2025_clean.csv", row.names = FALSE)
+write.csv(movies_cleaned,"data/movie_data.csv", row.names = FALSE)
 
 colnames(movies_cleaned)
 
@@ -142,10 +144,11 @@ movies_subset <- movies_cleaned |>
          directors,
          stars,
          awards_content,
-         Languages
+         Languages,
+         description
          )
 
-write.csv(movies_subset,"data/movie_data_2010-2025_clean_subset.csv", row.names = FALSE)
+write.csv(movies_subset,"data/movie_data_subset.csv", row.names = FALSE)
 
 # FILTER DATASET - KEEP ONLY FILMS WITH "$" CURRENCY FOR 
 # BUDGET AND GROSS_WORLDWIDE
@@ -153,7 +156,7 @@ write.csv(movies_subset,"data/movie_data_2010-2025_clean_subset.csv", row.names 
 movies_subset_dollars <- movies_subset |>
   filter(budget_currency == "$" & grossww_currency == "$")
 
-write_csv(movies_subset_dollars, "data/movie_data_2010-2025_clean_dollars.csv")
+write_csv(movies_subset_dollars, "data/movie_data_dollars.csv")
 
 # Additional EDA findings to clean during session? ----
 ## All variables but Year, Rating, and méta_score are chr

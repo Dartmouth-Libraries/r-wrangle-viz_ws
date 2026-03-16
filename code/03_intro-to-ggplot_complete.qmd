@@ -19,18 +19,15 @@ library(here)
 Now let's import this dataset:
 
 ```{r}
-movies <- read.csv(here("data", "movie_data_2010-2025_clean_dollars.csv"))
+movies <- read_csv(here("data/movie_data_dollars2.csv"))
 ```
 
 ```{r}
-print(dim(movies))
-movies <- movies |>
-  mutate(
-    budget_mm = budget_value / 1000000,
-    grossww_mm = grossww_value / 1000000
-  ) |>
-  filter(budget_value >= 1000)
-print(dim(movies))
+colnames(movies)
+```
+
+```{r}
+
 ```
 
 ## 2. First Plot: two variables

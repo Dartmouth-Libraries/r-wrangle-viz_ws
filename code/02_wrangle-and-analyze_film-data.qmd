@@ -5,17 +5,17 @@ format: html
 editor: visual
 ---
 
+## Opener
+
+## interactive portions
+
 ```{r}
 library(tidyverse)
 ```
 
 ```{r}
-df_temp <- read_csv("../../data/movie_data_2010-2025_clean_dollars.csv")
-```
-
-```{r}
 library(here)
-df <- read_csv(here("data/movie_data_2010-2025_clean_dollars.csv"))
+df <- read_csv(here("data/movie_data_dollars.csv"))
 ```
 
 ```{r}
@@ -30,13 +30,40 @@ parent genres
 
 ## Standardize Variable Names
 
+```{r}
+colnames(df)
+```
+
+```{r}
+df <- df |>
+  rename(
+    title=Title,
+    mpa=MPA,
+    rating = Rating,
+    languages = Languages
+  )
+```
+
 ## Clean / Wrangle Scores
 
-1.  01 - look at list of cleaning steps as is....
+Visually review our dataframe `df` by opening it in R Studio (either double-click on `df` in the `Environment` pane to the top right or run `view(df)`).
+
+```{r}
+view(df)
+```
 
 ## remove extreme or suspicious values
 
-## interactive portions
+Try sorting different columns (by clicking on the column names). Do you notice any extreme values that are suspicious data?
+
+Notice, for example, one movie has a budget of \$1. While there may be an explanation for this, let's remove it to avoid skewing some of our analysis:
+
+```{r}
+print(dim(df))
+df <- df |>
+  filter(budget_value >= 1000)
+print(dim(df))
+```
 
 # Calculate Profit
 
@@ -70,7 +97,11 @@ df = df |>
   mutate(profit_pct = net_profit_mm /  budget_mm * 100)
 ```
 
-## 
+### Export
+
+```{r}
+write_csv(df, here("data/movie_data_dollars2.csv"))
+```
 
 # Review Genres
 
@@ -105,6 +136,22 @@ genre_df <- df |>
   ) |>
   separate_rows(genre, sep = ",") |>   # split on comma
   mutate(genre = str_trim(genre))     # clean up whitespace around each genre name
+```
+
+## Map Parent Genres to Genres
+
+```{r}
+parent_genres <- read_csv(here("data/genre_list_edited_jm.csv"))
+head(parent_genres)
+```
+
+```{r}
+genre_df <- genre_df |>
+  left_join(
+    parent_genres |>
+      select(genre, parent_genre),
+    by = "genre"
+  )
 ```
 
 ### Verify
@@ -146,7 +193,7 @@ genre_aggreg |>
 genre_aggreg_alpha <- genre_aggreg |>
   arrange(genre)
 
-write_csv(genre_aggreg_alpha, "../../results/genre_list.csv")
+# write_csv(genre_aggreg_alpha, here("data/genre_list.csv"))
 
 ```
 
@@ -167,19 +214,21 @@ genre_df |>
 The IQR is a natural companion to the median and tells you about consistency — which genres are reliable bets vs. high-risk/high-reward.
 
 ```{r}
-
+head(genre_df)
 ```
 
 ## 
 
 ```{r}
-
+colnames(genre_df)
 ```
 
 ```{r}
-
+genre_df <- genre_df |>
+  select(-any_of("genres")) |>
+  select(title:meta_score, genre, parent_genre, date:last_col())
 ```
 
 ```{r}
-
+write_csv(genre_df, here("data/movie_split-by_genre.csv"))
 ```
