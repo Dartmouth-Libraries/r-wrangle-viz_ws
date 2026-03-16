@@ -1,0 +1,186 @@
+---
+title: "Other Visualizations"
+author: "Katie Owers Bonner"
+format: html
+editor: visual
+---
+
+# Session 4: Additional visualizations
+
+## Load data & packages if needed
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+df <- read_csv("../data/movie_data_2010-2025_clean_dollars.csv")
+```
+
+## The Question
+
+Let's come back to Question A from yesterday: (**How) do critical and popular opinions about movies diverge?**
+
+Our relevant variables are:
+
+-   Rating: IMDB's popular vote score
+
+-   meta_score: Weighted average of professional critic scores
+
+Reminder of what these variables look like from our exploratory analysis:
+
+```{r}
+summary(df[, c("Rating", "meta_score")])
+```
+
+```{r}
+ggplot(data =df, mapping = aes(x = meta_score, y=Rating)) +
+  geom_point()
+```
+
+## Create a dataset of the top 4 genres
+
+```{r}
+genre_df <- df |>
+  mutate(
+    genre = genres |>
+      str_remove_all("\\[|\\]|'") |>   # remove brackets and single quotes
+      str_trim()                         # remove any leading/trailing whitespace
+  ) |>
+  separate_rows(genre, sep = ",") |>   # split on comma
+  mutate(genre = str_trim(genre))   # clean up whitespace around each genre name
+  
+```
+
+```{r}
+sort(table(genre_df$genre), decreasing = T)
+```
+
+```{r}
+top_genre_df <- genre_df |>
+  filter(genre %in% c("Drama", "Comedy","Thriller", "Action"))
+```
+
+## Facet_wrap by genre
+
+```{r}
+ggplot(data =top_genre_df, mapping = aes(x = meta_score, y=Rating)) +
+  geom_point() +
+  facet_wrap(~genre)
+```
+
+show adding trendline? JEremy did this
+
+```{r}
+ggplot(data =top_genre_df, mapping = aes(x = meta_score, y=Rating)) +
+  geom_point() +
+  facet_wrap(~genre) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue")
+```
+
+# Boxplot/violin plot
+
+rating by genre
+
+```{r}
+ggplot(top_genre_df, mapping = aes(x = genre, y = Rating)) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(top_genre_df, mapping = aes(x = genre, y = Rating)) +
+  geom_boxplot(fill = "grey") +
+  theme_bw() +
+  geom_jitter(color="blue", size=0.4, alpha=0.7)
+```
+
+maybe redo this by duratin
+
+```{r}
+ggplot(top_genre_df, mapping = aes(x = genre, y = Rating)) +
+  geom_violin()
+```
+
+```{r}
+ggplot(top_genre_df, mapping = aes(x = genre, y = Rating)) +
+  geom_violin() +
+  geom_jitter(color="blue", size=0.5, alpha=0.7)
+```
+
+## Paired violin - would require different data structure
+
+```{r}
+ggplot(top_genre_df, mapping = aes(x= genre, y = ))
+```
+
+# Line plot
+
+Number of movies in each of the 4 genres by year?
+
+```{r}
+summary_data <- top_genre_df |>
+  group_by(year, genre) |>
+  summarise(
+    count = n()
+  )
+```
+
+```{r}
+ggplot(summary_data, aes(x=year, y=count, group = genre, color = genre)) +
+  geom_line()
+```
+
+Additions
+
+-   total number of films per year
+
+-   total \# of genres per year
+
+# Barplot (incl stacked)
+
+Percent of these movie 4 genres over time (of the total)?
+
+**Publishing Visualizations (30 mins?)**
+
+1.  exporting visualizations, refining them for publication
+
+    1.  save at higher resolution, in different formats
+
+    2.  ggsave
+
+2.  legends?
+
+Facet by Year or MPA?
+
+```{r}
+ggplot(data =df, mapping = aes(x = meta_score, y=Rating)) +
+  geom_point() +
+  facet_wrap(~MPA)
+```
+
+```{r}
+ggplot(data =df, mapping = aes(x = meta_score, y=Rating)) +
+  geom_point() +
+  facet_wrap(~year)
+```
+
+## Stacked barchart of genre by year
+
+## Duration
+
+```{r}
+ggplot(data = df, mapping = aes(x=duration_minutes)) +
+  geom_histogram(binwidth=10) +
+  xlim(50,max(df$duration_minutes))   +
+  theme_classic()
+```
+
+```{r}
+ggplot(data = df, mapping = aes(x=duration_minutes)) +
+  geom_density() +
+  xlim(50,max(df$duration_minutes))   +
+  theme_classic()
+```
+
+## Set ggplot Theme and Color Palette
