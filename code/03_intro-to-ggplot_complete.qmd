@@ -91,3 +91,21 @@ log_p <- ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
   
 log_p
 ```
+
+-   colors - parent genres
+
+-   smoothed_lines
+
+-   facets?
+
+-   theme_minimal? basic preset themes
+
+-   clusters?
+
+-   aggreg by genre:
+
+    -   animate by year
+
+    -   hover
+
+    -   connected scatter plot
