@@ -7,6 +7,30 @@ editor: visual
 
 # Session 4: Additional visualizations
 
+# ! material to add !
+
+**Question A:** (How) do critical and popular opinions about movies diverge?
+
+for one of them, can do more of an evolution
+
+-   start wiht a line graphs - ok, maybe too cluttered
+
+-   faceted graph or ridgeline plot
+
+-   Q2: What about movie duration vs rating?
+
+palettes?
+
+**Publishing Visualizations (30 mins?)**
+
+1.  exporting visualizations, refining them for publication
+
+    1.  save at higher resolution, in different formats
+
+    2.  ggsave
+
+2.  legends?
+
 ## Load data & packages if needed
 
 ```{r}
@@ -108,12 +132,6 @@ ggplot(top_genre_df, mapping = aes(x = genre, y = Rating)) +
   geom_jitter(color="blue", size=0.5, alpha=0.7)
 ```
 
-## Paired violin - would require different data structure
-
-```{r}
-ggplot(top_genre_df, mapping = aes(x= genre, y = ))
-```
-
 # Line plot
 
 Number of movies in each of the 4 genres by year?
@@ -141,15 +159,29 @@ Additions
 
 Percent of these movie 4 genres over time (of the total)?
 
-**Publishing Visualizations (30 mins?)**
+## Stacked barchart of genre by year
 
-1.  exporting visualizations, refining them for publication
+## Duration
 
-    1.  save at higher resolution, in different formats
+```{r}
+ggplot(data = df, mapping = aes(x=duration_minutes)) +   
+  geom_histogram(binwidth=10) +   
+  xlim(50,max(df$duration_minutes))   +   
+  theme_classic()
+```
 
-    2.  ggsave
+```{r}
+ggplot(data = df, mapping = aes(x=duration_minutes)) +   
+  geom_density() +   
+  xlim(50,max(df$duration_minutes))   +   
+  theme_classic()
+```
 
-2.  legends?
+## 
+
+# Aesthetics: Set ggplot Theme and Color Palette
+
+# Extra Material ?
 
 Facet by Year or MPA?
 
@@ -165,22 +197,8 @@ ggplot(data =df, mapping = aes(x = meta_score, y=Rating)) +
   facet_wrap(~year)
 ```
 
-## Stacked barchart of genre by year
+## Paired violin - would require different data structure
 
-## Duration
+`{r} ggplot(top_genre_df, mapping = aes(x= genre, y = ))}`
 
-```{r}
-ggplot(data = df, mapping = aes(x=duration_minutes)) +
-  geom_histogram(binwidth=10) +
-  xlim(50,max(df$duration_minutes))   +
-  theme_classic()
-```
-
-```{r}
-ggplot(data = df, mapping = aes(x=duration_minutes)) +
-  geom_density() +
-  xlim(50,max(df$duration_minutes))   +
-  theme_classic()
-```
-
-## Set ggplot Theme and Color Palette
+# 
