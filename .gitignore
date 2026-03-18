@@ -3,6 +3,8 @@ renv/
 
 .DS_Store
 
+images/
+
 #Katie's addition to Jeremy's additions
 code/Pre-workshop_data_wrangling/Scratch_KOB.R
 code/Pre-workshop_data_wrangling/KOB_Quarto_demo.qmd

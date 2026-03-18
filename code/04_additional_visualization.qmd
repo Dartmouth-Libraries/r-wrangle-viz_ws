@@ -9,17 +9,13 @@ editor: visual
 
 # ! material to add !
 
-**Publishing Visualizations (30 mins?)**
+1.  legends?
 
-1.  exporting visualizations, refining them for publication
+2.  examples of how charts can have issues - eg highest grossing files over time don’t account for inflation, increasing pop, more theaters
 
-    1.  save at higher resolution, in different formats
+    1.  number of votes and how those impact ratings (implement a \>10k votes filter)
 
-    2.  ggsave
-
-2.  legends?
-
-## Load data & packages if needed
+# Load data & packages if needed
 
 ```{r}
 library(tidyverse)
@@ -27,10 +23,10 @@ library(here)
 ```
 
 ```{r}
-df <- read_csv("../data/movie_data_dollars2.csv")
+df <- read_csv("../data/movie_data_financial.csv")
 ```
 
-## The Question
+# Exploring Critic vs Public Opinion
 
 Let's come back to Question A from yesterday: (**How) do critical and popular opinions about movies diverge?**
 
@@ -50,14 +46,15 @@ summary(df[, c("rating", "meta_score")])
 ggplot(data =df, mapping = aes(x = meta_score, y=rating)) +
   geom_point() + 
   labs(
-  x = "meta_score (critics)",
-  y = "rating (the public)"
-  )
+    title = "Critic vs public movie ratings",
+    x = "Critic Score",
+    y = "Public Score"
+    )
 ```
 
 ## Does this association vary by MPA Rating?
 
-Let's use an option called facet_wrap that splits up our plot by a factor in the data. Let's use the other kind of rating - MPA.
+Let's use an option called `facet_wrap` that splits up our plot by a factor in the data. Let's use the other kind of rating - MPA.
 
 ```{r}
 ggplot(data =df, mapping = aes(x = meta_score, y=rating)) +
@@ -69,24 +66,23 @@ ggplot(data =df, mapping = aes(x = meta_score, y=rating)) +
   facet_wrap(~mpa)
 ```
 
-## What about splitting by genre?
+## What about by genre?
 
 Let's load in the file where each movie is split out by genre and they are categorized into parent genres:
 
 ```{r}
-df_genre <- read_csv("../data/movie_split-by_genre.csv")
+df_genre <- read_csv("../data/movies_split-by_parent-genre.csv")
 
 ```
 
 ```{r}
 df_genre |>
-  summarise(unique_genres = n_distinct(genre),
-            unique_parent_genres = n_distinct(parent_genre))
+  summarise(unique_parent_genres = n_distinct(parent_genres))
 
 ```
 
 ```{r}
-table(df_genre$parent_genre)
+table(df_genre$parent_genres)
 ```
 
 And now do a figure where we facet by parent_genre:
@@ -98,7 +94,38 @@ ggplot(data =df_genre, mapping = aes(x = meta_score, y=rating)) +
   x = "meta_score (critics)",
   y = "rating (the public)"
   )  +
-  facet_wrap(~parent_genre)
+  facet_wrap(~parent_genres)
+```
+
+## Does the number of votes affect the relationship between public and critical opinion?
+
+```{r}
+ggplot(data = df, mapping = aes(x=votes)) +      
+  geom_histogram() 
+```
+
+That's a lot of movies with not a lot of votes! Let's look more into it:
+
+```{r}
+summary(df$votes)
+```
+
+How do movies with \<10,000 votes compare to the general distribution?
+
+```{r}
+df <- df |>
+  mutate(low_votes = ifelse(votes<10000,1,0))
+```
+
+```{r}
+ggplot(data =df, mapping = aes(x = meta_score, y=rating, 
+                               color = as.factor(low_votes))) +
+  geom_point() + 
+  labs(
+    title = "Critic vs public movie ratings",
+    x = "Critic Score",
+    y = "Public Score"
+    )
 ```
 
 # Boxplot/violin plot
@@ -106,36 +133,44 @@ ggplot(data =df_genre, mapping = aes(x = meta_score, y=rating)) +
 What if we wanted to look instead at the values of rating (the public score) by parent_genre?
 
 ```{r}
-ggplot(df_genre, mapping = aes(x = parent_genre, y = rating)) +
+ggplot(df_genre, mapping = aes(x = parent_genres, y = rating)) +
   geom_boxplot() + 
   theme(
   axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
   )
 ```
 
-What if we wanted to be able to see the point data as well as the summaries?
-
-```{r}
-ggplot(df_genre, mapping = aes(x = parent_genre, y = rating)) +
-  geom_boxplot(fill = "darkgrey") +
-  theme_minimal() +
-  geom_jitter(color="blue", size=0.4, alpha=0.3) + theme(
-  axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
-)
-```
+Take a minute to explore the theme axis text commands - what happens when you change various values?
 
 You can also sort the data so that the histograms are arranged according to their median value:
 
 ```{r}
-ggplot(df_genre, mapping = aes(x = fct_reorder(parent_genre, -rating, .fun=median), y = rating)) +   
-  geom_boxplot() +    
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)   )
+ggplot(df_genre, mapping = aes(x = fct_reorder(parent_genres, -rating, .fun=median), y = rating)) +      
+  geom_boxplot() +       
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)   
+        )
 ```
+
+This conveys a lot of information! What might be missing?
+
+What if we wanted to be able to see the point data as well as the summaries?
+
+```{r}
+ggplot(df_genre, mapping = aes(x = fct_reorder(parent_genres, -rating, .fun=median), y = rating)) +
+  geom_boxplot(fill = "darkgrey")  + 
+  theme(
+  axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
+  ) +
+  geom_jitter(color="blue", size=0.4, alpha=0.3)
+```
+
+Now explore the parameters in `geom_jitter` to see what they control.
 
 What about another way of looking at this data? Violin plots show the shape of the data distribution, combining elements of histograms and the underlying points.
 
 ```{r}
-ggplot(df_genre, mapping = aes(x = parent_genre, y = rating)) +
+ggplot(df_genre, mapping = aes(x = parent_genres, y = rating)) +
   geom_violin() + 
   theme(
   axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
@@ -146,11 +181,11 @@ ggplot(df_genre, mapping = aes(x = parent_genre, y = rating)) +
 
 What if you were curious about the number of movies in each parent genre by year?
 
-First, let's calculate those yearly summaries we'll need:
+First, let's calculate those yearly summaries:
 
 ```{r}
 genre_summary_data <- df_genre |>
-  group_by(year, parent_genre) |>
+  group_by(year, parent_genres) |>
   summarise(
     count = n()
   )
@@ -158,27 +193,29 @@ genre_summary_data <- df_genre |>
 
 ```{r}
 ggplot(genre_summary_data, aes(x=year, y=count, 
-                               group = parent_genre, color = parent_genre)) +
+                               group = parent_genres, color = parent_genres)) +
   geom_line()
 ```
 
-What if you wanted a different color palette?
+Another visual tool is highlighting a single (or few) line(s) of interest. Say we were interested in trends in comedies. We could make all the other lines grey and leave comedies red to show them in context while also highlighting the category of interest:
 
 ```{r}
-ggplot(summary_data, aes(x=year, y=count, group = parent_genre, color = parent_genre)) +
-  geom_line() + 
-  scale_color_hue(h = c(180, 300))
+ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = parent_genres)) +
+  geom_line(color = "grey", alpha = 0.5) + 
+  geom_line(data = subset(genre_summary_data, parent_genres == "comedy"), color = "red")
+```
+
+Make this a ridgeline? by mean of the genre? % of total?
+
+```{r}
+#install.packages("ggridges")
+library(ggridges)
 ```
 
 ```{r}
-ggplot(summary_data, aes(x=year, y=count, group = parent_genre, color = parent_genre)) +
-  geom_line() + 
-  scale_color_manual(values=c("#69b3a2", "purple", "pink","red", "orange", "black","darkgrey", "lightblue", "yellow","violet", "lavender",  "white","darkgreen", "green","orchid","cyan" ))
+ggplot(genre_summary_data, aes(x=year, y=parent_genres, fill = parent_genres)) +
+  geom_density_ridges()
 ```
-
-There are some good resources for your color adventures at <https://r-graph-gallery.com/ggplot2-color.html>!
-
-Make this a ridgeline?by mean of the genre? % of total?
 
 highlight a single line
 
@@ -188,40 +225,86 @@ Next steps
 
 -   total \# of genres per year
 
-# Barplot (incl stacked)
+# Changing Aesthetics
 
-Percent of these movie 4 genres over time (of the total)?
+## Color Palette
 
-## Stacked barchart of genre by year
-
-## Duration
+Back to our line plots above - what if you wanted a different color palette for your figure?
 
 ```{r}
-ggplot(data = df, mapping = aes(x=duration_minutes)) +   
-  geom_histogram(binwidth=10) +   
-  xlim(50,max(df$duration_minutes))   +   
+ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = parent_genres)) +   
+  geom_line() +    
+  scale_color_hue(h = c(180, 300))
+```
+
+Or to explicitly control the color of each line?
+
+```{r}
+ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = parent_genres)) +   
+  geom_line() +    
+  scale_color_manual(values=c("#69b3a2", "purple", "pink","red", "orange", "black","darkgrey", "lightblue", "yellow","violet", "lavender",  "white","darkgreen", "green","orchid","cyan" ))
+```
+
+There are some good resources for your color adventures at <https://r-graph-gallery.com/ggplot2-color.html>!
+
+## GGplot also has many themes built in that change the underlying appearance of figures
+
+Let's look at some histograms with various themes:
+
+```{r}
+ggplot(data = df, mapping = aes(x=duration_minutes)) +      
+  geom_histogram(binwidth=10) +      
+  xlim(50,max(df$duration_minutes))  
+```
+
+```{r}
+ggplot(data = df, mapping = aes(x=duration_minutes)) +      
+  geom_histogram(binwidth=10) +      
+  xlim(50,max(df$duration_minutes)) +
   theme_classic()
 ```
 
 ```{r}
-ggplot(data = df, mapping = aes(x=duration_minutes)) +   
-  geom_density() +   
-  xlim(50,max(df$duration_minutes))   +   
-  theme_classic()
+ggplot(data = df, mapping = aes(x=duration_minutes)) +      
+  geom_histogram(binwidth=10) +      
+  xlim(50,max(df$duration_minutes)) +
+  theme_bw()
 ```
 
-## 
+See built-in theme options here: <https://ggplot2.tidyverse.org/reference/ggtheme.html>
 
-# Aesthetics: Set ggplot Theme and Color Palette
+# Saving plots
 
-# 
+ggsave is the function for saving ggplots. It defaults to saving the last plot displayed, at a default size and resolution depending on the filetype
 
-## Additional ideas to explore
+```{r}
+ggsave("../images/plot.png")
+```
 
--   What about movie duration vs rating?
+```{r}
+ggsave("../images/plot_20x20cm.pdf", width = 20, height = 20, units = "cm")
+```
 
-# Reflection section
+```{r}
+ggsave("../images/plot_highres.jpeg", dpi=600)
+```
+
+You can also assign `ggsave()` a specific plot to save:
+
+```{r}
+p <- ggplot(data = df, mapping = aes(x=duration_minutes)) +      
+  geom_histogram(binwidth=10, fill ="red") +      
+  xlim(50,max(df$duration_minutes)) +
+  theme_bw()
+
+
+ggsave("../images/plot_red.png", p)
+```
+
+# Reflection
 
 -   What other questions do you have about this data that can be answered by a visual?
 
--   Do you want to apply what you learned to your own data?
+    -   What about movie duration vs rating?
+
+-   How do you want to apply what you learned to your own data?
