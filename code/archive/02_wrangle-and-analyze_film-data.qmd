@@ -1,0 +1,240 @@
+---
+title: "Wrangle and Analyze Film Data"
+author: "Jeremy Mikecz"
+format: html
+editor: visual
+---
+
+## Questions
+
+1.  What
+
+## interactive portions
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+library(here)
+df <- read_csv(here("data/movie_data_dollars.csv"))
+```
+
+```{r}
+head(df)
+```
+
+Opener and Closer - referring back to big research questions
+
+change filename - remove years and remove clean from the title of the file
+
+parent genres
+
+## Standardize Variable Names
+
+```{r}
+colnames(df)
+```
+
+```{r}
+df <- df |>
+  rename(
+    title=Title,
+    mpa=MPA,
+    rating = Rating,
+    languages = Languages
+  )
+```
+
+## Clean / Wrangle Scores
+
+Visually review our dataframe `df` by opening it in R Studio (either double-click on `df` in the `Environment` pane to the top right or run `view(df)`).
+
+```{r}
+view(df)
+```
+
+## remove extreme or suspicious values
+
+Try sorting different columns (by clicking on the column names). Do you notice any extreme values that are suspicious data?
+
+Notice, for example, one movie has a budget of \$1. While there may be an explanation for this, let's remove it to avoid skewing some of our analysis:
+
+```{r}
+print(dim(df))
+df <- df |>
+  filter(budget_value >= 1000)
+print(dim(df))
+```
+
+# Calculate Profit
+
+## Make Numbers more manageable
+
+```{r}
+summary(df$grossww_value)
+```
+
+## Visualize Distributions
+
+Convert to millions:
+
+```{r}
+df <- df |> 
+  mutate(budget_mm = budget_value / 1000000,
+         grossww_mm = grossww_value / 1000000)
+```
+
+Calculate Profit
+
+```{r}
+df = df |>
+  mutate(net_profit_mm = grossww_mm - budget_mm)
+```
+
+Calculate Profit as Percent of Budget
+
+```{r}
+df = df |>
+  mutate(profit_pct = net_profit_mm /  budget_mm * 100)
+```
+
+### Export
+
+```{r}
+write_csv(df, here("data/movie_data_dollars2.csv"))
+```
+
+# Review Genres
+
+Let's take a look at the genre column:
+
+```{r}
+df$genres[0:10]
+```
+
+Each film appears once per genre, so multi-genre films are counted multiple times. This means genres that frequently co-occur may have correlated estimates. It also means a film with two assigned genres is counted just twice while one with five is counted five times.
+
+Some possible solutions:
+
+-   **one row per film/genre (EASIEST)**: split genres into different rows, so that a five-genre film is split out into five rows
+
+-   **one row per film genre (weighted)**: split genres into different rows but weight each genre by its proportion. So a "horror-comedy" means horror counts for 0.5 genres and comedy also for 0.5.
+
+-   **one row per film, one column per genre**\*\* (wide/dummy format): create a separate binary column (TRUE / FALSE) for each genre; best for statistical modeling and controlling (i.e. "controlling for other genres, what is horror's effect?")
+
+Let's do the simplest approach: one row per film / genre (no weighting).
+
+*whiteboard*
+
+*demo string functions a bit*
+
+```{r}
+genre_df <- df |>
+  mutate(
+    genre = genres |>
+      str_remove_all("\\[|\\]|'") |>   # remove brackets and single quotes
+      str_trim()                         # remove any leading/trailing whitespace
+  ) 
+```
+
+```{r}
+genre_df <- genre_df |>
+  separate_rows(genre, sep = ",") |>   # split on comma
+  mutate(genre = str_trim(genre))     # clean up whitespace around each genre name
+```
+
+## Map Parent Genres to Genres
+
+```{r}
+parent_genres <- read_csv(here("data/genre_list_edited_jm.csv"))
+head(parent_genres)
+```
+
+```{r}
+genre_df <- genre_df |>
+  left_join(
+    parent_genres |>
+      select(genre, parent_genre),
+    by = "genre"
+  )
+```
+
+### Verify
+
+```{r}
+genre_df |> 
+  filter(str_detect(genre, '"')) |> 
+  select(genre) |> 
+  head()
+```
+
+## Examine Distributions of Genres
+
+```{r}
+
+```
+
+## Median ROI by genre
+
+```{r}
+genre_aggreg <- genre_df |>
+  group_by(genre) |>
+  summarize(
+    median_roi = median(profit_pct, na.rm = TRUE),
+    n = n()
+  ) |>
+  arrange(desc(median_roi))
+  
+```
+
+```{r}
+genre_aggreg |>
+  filter (n>=20)
+```
+
+**Export list of genres with ROI and n**
+
+```{r}
+genre_aggreg_alpha <- genre_aggreg |>
+  arrange(genre)
+
+# write_csv(genre_aggreg_alpha, here("data/genre_list.csv"))
+
+```
+
+**Add spread to the summary** Median alone doesn't capture risk. A genre with high median ROI but huge variance is a very different bet than one with moderate but consistent returns:
+
+```{r}
+genre_df |>
+  group_by(genre) |>
+  summarize(
+    median_roi = median(profit_pct, na.rm = TRUE),
+    iqr_roi    = IQR(profit_pct, na.rm = TRUE),   # interquartile range = spread
+    n          = n()
+  ) |>
+  filter(n >= 50) |>
+  arrange(desc(median_roi))
+```
+
+The IQR is a natural companion to the median and tells you about consistency — which genres are reliable bets vs. high-risk/high-reward.
+
+```{r}
+head(genre_df)
+```
+
+## 
+
+```{r}
+colnames(genre_df)
+```
+
+```{r}
+genre_df <- genre_df |>
+  select(-any_of("genres")) |>
+  select(title:meta_score, genre, parent_genre, date:last_col())
+```
+
+```{r}
+write_csv(genre_df, here("data/movie_split-by_genre.csv"))
+```

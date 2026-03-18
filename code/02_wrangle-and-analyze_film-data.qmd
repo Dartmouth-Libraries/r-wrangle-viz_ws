@@ -110,7 +110,7 @@ write_csv(df, here("data/movie_data_dollars2.csv"))
 Let's take a look at the genre column:
 
 ```{r}
-df$genres[0:10]
+df$parent_genres[0:10]
 ```
 
 Each film appears once per genre, so multi-genre films are counted multiple times. This means genres that frequently co-occur may have correlated estimates. It also means a film with two assigned genres is counted just twice while one with five is counted five times.
@@ -130,43 +130,13 @@ Let's do the simplest approach: one row per film / genre (no weighting).
 *demo string functions a bit*
 
 ```{r}
+
+```
+
+```{r}
 genre_df <- df |>
-  mutate(
-    genre = genres |>
-      str_remove_all("\\[|\\]|'") |>   # remove brackets and single quotes
-      str_trim()                         # remove any leading/trailing whitespace
-  ) 
-```
-
-```{r}
-genre_df <- genre_df |>
-  separate_rows(genre, sep = ",") |>   # split on comma
-  mutate(genre = str_trim(genre))     # clean up whitespace around each genre name
-```
-
-## Map Parent Genres to Genres
-
-```{r}
-parent_genres <- read_csv(here("data/genre_list_edited_jm.csv"))
-head(parent_genres)
-```
-
-```{r}
-genre_df <- genre_df |>
-  left_join(
-    parent_genres |>
-      select(genre, parent_genre),
-    by = "genre"
-  )
-```
-
-### Verify
-
-```{r}
-genre_df |> 
-  filter(str_detect(genre, '"')) |> 
-  select(genre) |> 
-  head()
+  separate_rows(parent_genres, sep = ",") |>   # split on comma
+  mutate(parent_genres = str_trim(parent_genres))     # clean up whitespace around each genre name
 ```
 
 ## Examine Distributions of Genres
@@ -179,7 +149,7 @@ genre_df |>
 
 ```{r}
 genre_aggreg <- genre_df |>
-  group_by(genre) |>
+  group_by(parent_genres) |>
   summarize(
     median_roi = median(profit_pct, na.rm = TRUE),
     n = n()
@@ -197,7 +167,7 @@ genre_aggreg |>
 
 ```{r}
 genre_aggreg_alpha <- genre_aggreg |>
-  arrange(genre)
+  arrange(parent_genres)
 
 # write_csv(genre_aggreg_alpha, here("data/genre_list.csv"))
 
@@ -207,7 +177,7 @@ genre_aggreg_alpha <- genre_aggreg |>
 
 ```{r}
 genre_df |>
-  group_by(genre) |>
+  group_by(parent_genres) |>
   summarize(
     median_roi = median(profit_pct, na.rm = TRUE),
     iqr_roi    = IQR(profit_pct, na.rm = TRUE),   # interquartile range = spread
@@ -232,9 +202,9 @@ colnames(genre_df)
 ```{r}
 genre_df <- genre_df |>
   select(-any_of("genres")) |>
-  select(title:meta_score, genre, parent_genre, date:last_col())
+  select(title:meta_score, parent_genres, date:last_col())
 ```
 
 ```{r}
-write_csv(genre_df, here("data/movie_split-by_genre.csv"))
+write_csv(genre_df, here("data/movies_split-by_parent-genre.csv"))
 ```
