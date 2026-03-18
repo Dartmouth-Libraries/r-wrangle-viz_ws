@@ -17,7 +17,7 @@ library(tidyverse)
 
 ```{r}
 library(here)
-df <- read_csv(here("data/movie_data_dollars.csv"))
+df <- read_csv(here("data/movie_data.csv"))
 ```
 
 ```{r}
