@@ -36,7 +36,7 @@ Let's come back to Question A from yesterday: (**How) do critical and popular op
 
 Our relevant variables are:
 
--   rating: IMDB's popular vote score \[note the PG/R/etc "rating" is "mpa" in this dataset\]
+-   rating: IMDB's popular vote score (note the PG/R/etc. rating is called "mpa" in this dataset)
 
 -   meta_score: Weighted average of professional critic scores
 
@@ -48,10 +48,11 @@ summary(df[, c("rating", "meta_score")])
 
 ```{r}
 ggplot(data =df, mapping = aes(x = meta_score, y=rating)) +
-  geom_point() + labs(
+  geom_point() + 
+  labs(
   x = "meta_score (critics)",
   y = "rating (the public)"
-)
+  )
 ```
 
 ## Does this association vary by MPA Rating?
@@ -60,11 +61,12 @@ Let's use an option called facet_wrap that splits up our plot by a factor in the
 
 ```{r}
 ggplot(data =df, mapping = aes(x = meta_score, y=rating)) +
-  geom_point() +
-  facet_wrap(~mpa) + labs(
+  geom_point()  + 
+  labs(
   x = "meta_score (critics)",
   y = "rating (the public)"
-)
+  ) +
+  facet_wrap(~mpa)
 ```
 
 ## What about splitting by genre?
@@ -73,59 +75,81 @@ Let's load in the file where each movie is split out by genre and they are categ
 
 ```{r}
 df_genre <- read_csv("../data/movie_split-by_genre.csv")
+
+```
+
+```{r}
+df_genre |>
+  summarise(unique_genres = n_distinct(genre),
+            unique_parent_genres = n_distinct(parent_genre))
+
+```
+
+```{r}
 table(df_genre$parent_genre)
 ```
 
-```{r}
-
-```
-
-And now do a graph where we facet by parent_genre:
+And now do a figure where we facet by parent_genre:
 
 ```{r}
 ggplot(data =df_genre, mapping = aes(x = meta_score, y=rating)) +
-  geom_point() +
-  facet_wrap(~parent_genre) + labs(
+  geom_point() + 
+  labs(
   x = "meta_score (critics)",
   y = "rating (the public)"
-)
+  )  +
+  facet_wrap(~parent_genre)
 ```
 
 # Boxplot/violin plot
 
-rating by genre
+What if we wanted to look instead at the values of rating (the public score) by parent_genre?
 
 ```{r}
 ggplot(df_genre, mapping = aes(x = parent_genre, y = rating)) +
-  geom_boxplot() + theme(
+  geom_boxplot() + 
+  theme(
   axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
-)
+  )
 ```
 
+What if we wanted to be able to see the point data as well as the summaries?
+
 ```{r}
 ggplot(df_genre, mapping = aes(x = parent_genre, y = rating)) +
-  geom_boxplot(fill = "grey") +
-  theme_bw() +
+  geom_boxplot(fill = "darkgrey") +
+  theme_minimal() +
   geom_jitter(color="blue", size=0.4, alpha=0.3) + theme(
   axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
 )
 ```
 
-maybe redo this by duratin
+You can also sort the data so that the histograms are arranged according to their median value:
+
+```{r}
+ggplot(df_genre, mapping = aes(x = fct_reorder(parent_genre, -rating, .fun=median), y = rating)) +   
+  geom_boxplot() +    
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)   )
+```
+
+What about another way of looking at this data? Violin plots show the shape of the data distribution, combining elements of histograms and the underlying points.
 
 ```{r}
 ggplot(df_genre, mapping = aes(x = parent_genre, y = rating)) +
-  geom_violin() + theme(
+  geom_violin() + 
+  theme(
   axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
-)
+  )
 ```
 
-# Line plot
+# Line plots
 
-Number of movies in each of the 4 genres by year?
+What if you were curious about the number of movies in each parent genre by year?
+
+First, let's calculate those yearly summaries we'll need:
 
 ```{r}
-summary_data <- df_genre |>
+genre_summary_data <- df_genre |>
   group_by(year, parent_genre) |>
   summarise(
     count = n()
@@ -133,7 +157,8 @@ summary_data <- df_genre |>
 ```
 
 ```{r}
-ggplot(summary_data, aes(x=year, y=count, group = parent_genre, color = parent_genre)) +
+ggplot(genre_summary_data, aes(x=year, y=count, 
+                               group = parent_genre, color = parent_genre)) +
   geom_line()
 ```
 
@@ -148,10 +173,14 @@ ggplot(summary_data, aes(x=year, y=count, group = parent_genre, color = parent_g
 ```{r}
 ggplot(summary_data, aes(x=year, y=count, group = parent_genre, color = parent_genre)) +
   geom_line() + 
-  scale_color_manual(values=c("#69b3a2", "purple", "black","red", "orange", "pink","darkgrey", "lightblue", "yellow","violet", "lavender",  "white","darkgreen", "darkorange","orchid","cyan" ))
+  scale_color_manual(values=c("#69b3a2", "purple", "pink","red", "orange", "black","darkgrey", "lightblue", "yellow","violet", "lavender",  "white","darkgreen", "green","orchid","cyan" ))
 ```
 
 There are some good resources for your color adventures at <https://r-graph-gallery.com/ggplot2-color.html>!
+
+Make this a ridgeline?by mean of the genre? % of total?
+
+highlight a single line
 
 Next steps
 
@@ -190,3 +219,9 @@ ggplot(data = df, mapping = aes(x=duration_minutes)) +
 ## Additional ideas to explore
 
 -   What about movie duration vs rating?
+
+# Reflection section
+
+-   What other questions do you have about this data that can be answered by a visual?
+
+-   Do you want to apply what you learned to your own data?

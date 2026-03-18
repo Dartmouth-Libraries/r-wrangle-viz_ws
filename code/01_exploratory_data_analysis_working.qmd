@@ -95,7 +95,7 @@ What did we learn?
 
 ```
 
-### Get summary statistics for variables relevant to question A (Rating, meta_score) budget_value, grossww_value
+### Get summary statistics for variables relevant to question A (Rating, meta_score)
 
 ```{r}
 

@@ -1,10 +1,12 @@
 .Rproj
 renv/
 
+.DS_Store
+
 #Katie's addition to Jeremy's additions
-00_workshop_prep/Scratch_KOB.R
-00_workshop_prep/KOB_Quarto_demo.qmd
-00_workshop_prep/KOB_Viz_Scratch.qmd
+code/Pre-workshop_data_wrangling/Scratch_KOB.R
+code/Pre-workshop_data_wrangling/KOB_Quarto_demo.qmd
+code/Pre-workshop_data_wrangling/KOB_Viz_Scratch.qmd
 
 #Jeremy's addition's to Github .gitignore R template
 .Rprofile
