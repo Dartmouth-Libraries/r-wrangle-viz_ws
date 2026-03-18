@@ -5,7 +5,9 @@ format: html
 editor: visual
 ---
 
-## Opener
+## Questions
+
+1.  What
 
 ## interactive portions
 
@@ -133,7 +135,11 @@ genre_df <- df |>
     genre = genres |>
       str_remove_all("\\[|\\]|'") |>   # remove brackets and single quotes
       str_trim()                         # remove any leading/trailing whitespace
-  ) |>
+  ) 
+```
+
+```{r}
+genre_df <- genre_df |>
   separate_rows(genre, sep = ",") |>   # split on comma
   mutate(genre = str_trim(genre))     # clean up whitespace around each genre name
 ```

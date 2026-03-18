@@ -51,6 +51,32 @@ movies_cleaned <- movies_cleaned |>
 
 
 
+## GENRES: MAP SUB-GENRES IN DF TO PARENT GENRES
+genre_map <- read_csv("data/genre_list_edited_jm.csv")
+
+movies_cleaned <- movies_cleaned |>
+  mutate(
+    # Parse the string list into an actual list-column of character vectors
+    genres_list = str_extract_all(genres, "[A-Za-z][A-Za-z &-]+"),
+    
+    # Map each genre to its parent, then deduplicate
+    parent_genres = map(genres_list, ~ {
+      .x |>
+        tibble(genre = .) |>
+        left_join(genre_map |> select(genre, parent_genre), by = "genre") |>
+        pull(parent_genre) |>
+        purrr::discard(is.na) |>     # conflict with scales::discard()
+        (\(x) x[!duplicated(x)])()  # <-- replaces unique()
+    })
+  ) |>
+  select(-genres_list) |> # drop the helper column if you don't need it
+  # collapse parent_genres list into a string
+  mutate(
+    parent_genres = map_chr(parent_genres, paste, collapse = ", ")
+  )
+
+
+
 ## Budget ----
 
 # Remove everything not in USD ($ at front of string) & the (estimated) part of the string
@@ -125,6 +151,7 @@ movies_subset <- movies_cleaned |>
          Rating,
          meta_score,
          genres,
+         parent_genres,
          date,
          year,
          month,
