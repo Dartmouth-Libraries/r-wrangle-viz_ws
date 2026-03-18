@@ -102,7 +102,7 @@ df = df |>
 ### Export
 
 ```{r}
-write_csv(df, here("data/movie_data_dollars2.csv"))
+write_csv(df, here("data/movie_data_financial.csv"))
 ```
 
 # Review Genres

@@ -55,6 +55,13 @@ ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
   geom_point(color="steelblue4", alpha = 0.3, size=3)
 ```
 
+### 2c. Adjust color as a variable
+
+```{r}
+ggplot(movies, aes(x=budget_mm, y=grossww_mm, color=mpa)) +
+  geom_point(alpha = 0.3, size=3)
+```
+
 ### 2c. Add a smoothed line
 
 ```{r}
@@ -87,6 +94,101 @@ log_p <- ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
   annotation_logticks()
   
 log_p
+```
+
+## 3. Working with Genres
+
+```{r}
+genre_df <- read_csv(here("data/movies_split-by_parent-genre.csv"))
+```
+
+```{r}
+head(genre_df)
+```
+
+```{r}
+genre2020_df <- genre_df |>
+  filter(year >= 2020)
+```
+
+```{r}
+ggplot(genre2020_df, aes(x=budget_mm, y=grossww_mm, color=parent_genres)) +
+  geom_point(alpha = 0.3, size=3) +
+  geom_smooth(color="purple") +
+  scale_x_log10(labels = label_dollar(suffix = "M")) +
+  scale_y_log10(labels = label_dollar(suffix = "M")) +
+  annotation_logticks() 
+  
+```
+
+```{r}
+ggplot(genre2020_df, aes(x = budget_mm, y = grossww_mm)) +
+  geom_point(alpha = 0.3, size = 3) +
+  geom_smooth(color="purple") +
+  scale_x_log10(labels = label_dollar(suffix = "M")) +
+  scale_y_log10(labels = label_dollar(suffix = "M")) +
+  annotation_logticks() +
+  facet_wrap(~ parent_genres, ncol=2)
+```
+
+```{r}
+colnames(genre2020_df)
+```
+
+```{r}
+ggplot(genre2020_df, aes(x = budget_mm, y = grossww_mm)) +
+  geom_point(alpha = 0.3, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+  facet_wrap(~ parent_genres, ncol=3) +
+  labs(
+    title    = "Budget vs. Worldwide Gross by Genre",
+    subtitle = "Dashed line = break-even",
+    x        = "Budget ($ millions)",
+    y        = "Worldwide Gross ($ millions)"
+  )
+```
+
+## ROI Distribution by Genre (Box Plot)
+
+A bar chart of medians hides the spread. Use a box plot to see the **full distribution** of ROI across genres, including variability and outliers.
+
+```{r}
+ggplot(genre2020_df, aes(x = reorder(parent_genres, profit_pct, median), y = profit_pct)) +
+  geom_boxplot(outlier.alpha = 0.2) +
+  coord_flip() +
+  labs(
+    title = "Distribution of ROI by Genre",
+    x     = "Genre",
+    y     = "ROI (%)"
+  )
+```
+
+## High-Return Low-Budget Films (Scatter Plot, Interactive)
+
+To directly highlight films that made a lot relative to a small budget, we can size or color points by `profit_pct`, and filter to a budget range of interest. Using **plotly** makes it easy to hover and identify specific films.
+
+```{r}
+# install.packages("plotly")
+library(plotly)
+
+low_budget <- genre2020_df |>
+  filter(budget_mm <= 50, profit_pct > 0)
+
+p <- ggplot(low_budget, aes(
+    x      = budget_mm,
+    y      = grossww_mm,
+    color  = parent_genres,
+    size   = profit_pct,
+    text   = paste0(title, "\nROI: ", round(profit_pct), "%")
+  )) +
+  geom_point(alpha = 0.5) +
+  labs(
+    title = "Low-Budget Films (≤ $50M) by Worldwide Gross",
+    x     = "Budget ($ millions)",
+    y     = "Worldwide Gross ($ millions)"
+  )
+
+ggplotly(p, tooltip = "text")
 ```
 
 -   colors - parent genres
