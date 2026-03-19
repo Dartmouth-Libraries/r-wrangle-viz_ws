@@ -99,7 +99,7 @@ There are a lot of NAs in `meta_score`!
 summary(movies)
 ```
 
-### Get summary statistics for variables relevant to question A (Rating, meta_score) 
+### Get summary statistics for variables relevant to question A (Rating, meta_score)
 
 ```{r}
 summary(movies[, c("Rating", "meta_score")])

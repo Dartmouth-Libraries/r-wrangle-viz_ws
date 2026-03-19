@@ -14,15 +14,33 @@ Jeremy Mikecz, Emily Myers, Katie Owers Bonner
 ## 3. Designed for:
 
 In person workshop, 2 sessions of 3.5h 
+
+Day 1
+* 9:00 – 9:30 Introductions, orientation, & setup
+* 9:30 – 10:30 Exploring your data
+* 10:30 – 10:45 Break
+* 10:45 – 12:00  Wrangling your data 
+* 12:00 – 12:30 (Optional) Additional exploration and Q&A
+
+Day 2
+* 9:00 – 9:15 Introduction to Day 2
+* 9:15 – 10:30 Building a plot in ggplot
+* 10:30 – 10:45 Break
+* 10:45 – 12:00 Additional visualization options and saving visualizations
+* 12:00 – 12:30 (Optional) Additional exploration and Q&A
+
   
 ## 4. Learning Objectives
 
 Upon completing the lessons offered here, attendees will be able to:
 
-* Set up a project in R
+* Set up a project in R studio
+* Import a csv data file
 * Explore a dataset using various data summary and visualization techniques
-* Conduct basic data cleaning in R using the tidyverse
-* Create and customize different types of plots and figures with ggplot
+* Conduct basic data cleaning and wrangling in R using the tidyverse
+* Create and customize different types of plots and figures with ggplot 
+* Export results, including modified datasets and plots
+
   
 ## 5. Instructor(s) and Years Taught (if taught live)
 
