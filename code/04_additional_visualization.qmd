@@ -13,8 +13,6 @@ editor: visual
 
 2.  examples of how charts can have issues - eg highest grossing files over time don’t account for inflation, increasing pop, more theaters
 
-    1.  number of votes and how those impact ratings (implement a \>10k votes filter)
-
 # Load data & packages if needed
 
 ```{r}
@@ -28,7 +26,7 @@ movies <- read_csv("../data/movie_data_financial.csv")
 
 # Exploring Critic vs Public Opinion
 
-Let's come back to another question from our last session: (**How) do critical and popular opinions about movies diverge?**
+Let's come back to another question from our first day: (**How) do critical and popular opinions about movies diverge?**
 
 The relevant variables are:
 
@@ -99,6 +97,8 @@ ggplot(data =movies_genre, mapping = aes(x = meta_score, y=rating)) +
 
 ## Does the number of votes affect the relationship between public and critical opinion?
 
+-   **`Votes`** = Total user votes on IMDb.
+
 ```{r}
 ggplot(data = movies, mapping = aes(x=votes)) +      
   geom_histogram() 
@@ -114,7 +114,7 @@ How do movies with \<10,000 votes compare to the general distribution?
 
 ```{r}
 movies <- movies |>
-  mutate(low_votes = ifelse(votes<10000,1,0))
+  mutate(low_votes = ifelse(votes<10000,"Yes","No"))
 ```
 
 ```{r}
@@ -124,9 +124,25 @@ ggplot(data =movies, mapping = aes(x = meta_score, y=rating,
   labs(
     title = "Critic vs public movie ratings",
     x = "Critic Score",
-    y = "Public Score"
-    )
+    y = "Public Score",
+    color = "<10k votes?"
+    ) 
 ```
+
+```{r}
+ggplot(data =movies, mapping = aes(x = meta_score, y=rating, 
+                               color = as.factor(low_votes))) +
+  geom_point() + 
+  labs(
+    title = "Critic vs public movie ratings",
+    x = "Critic Score",
+    y = "Public Score",
+    color = "<10k votes?"
+    ) +
+  scale_color_manual(values = c("Yes" = "red", "No" = "blue")) 
+```
+
+What next steps might you take to answer this question?
 
 # Boxplot/violin plot
 
@@ -154,7 +170,7 @@ ggplot(movies_genre, mapping = aes(x = fct_reorder(parent_genres, -rating, .fun=
 
 This conveys a lot of information! What might be missing?
 
-What if we wanted to be able to see the point data as well as the summaries?
+What if we wanted to be able to see how many movies were in each boxplot as well as the summary values?
 
 ```{r}
 ggplot(movies_genre, mapping = aes(x = fct_reorder(parent_genres, -rating, .fun=median), y = rating)) +
@@ -164,8 +180,6 @@ ggplot(movies_genre, mapping = aes(x = fct_reorder(parent_genres, -rating, .fun=
   ) +
   geom_jitter(color="blue", size=0.4, alpha=0.3)
 ```
-
-Now explore the parameters in `geom_jitter` to see what they control.
 
 What about another way of looking at this data? Violin plots show the shape of the data distribution, combining elements of histograms and the underlying points.
 
@@ -197,6 +211,8 @@ ggplot(genre_summary_data, aes(x=year, y=count,
   geom_line()
 ```
 
+There are some interesting patterns here!
+
 Another visual tool is highlighting a single (or few) line(s) of interest. Say we were interested in trends in comedies. We could make all the other lines grey and leave comedies red to show them in context while also highlighting the category of interest:
 
 ```{r}
@@ -204,20 +220,6 @@ ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = p
   geom_line(color = "grey", alpha = 0.5) + 
   geom_line(data = subset(genre_summary_data, parent_genres == "comedy"), color = "red")
 ```
-
-Make this a ridgeline? by mean of the genre? % of total?
-
-```{r}
-#install.packages("ggridges")
-library(ggridges)
-```
-
-```{r}
-ggplot(genre_summary_data, aes(x=year, y=parent_genres, fill = parent_genres)) +
-  geom_density_ridges()
-```
-
-highlight a single line
 
 Next steps
 
@@ -227,27 +229,7 @@ Next steps
 
 # Changing Aesthetics
 
-## Color Palette
-
-Back to our line plots above - what if you wanted a different color palette for your figure?
-
-```{r}
-ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = parent_genres)) +   
-  geom_line() +    
-  scale_color_hue(h = c(180, 300))
-```
-
-Or to explicitly control the color of each line?
-
-```{r}
-ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = parent_genres)) +   
-  geom_line() +    
-  scale_color_manual(values=c("#69b3a2", "purple", "pink","red", "orange", "black","darkgrey", "lightblue", "yellow","violet", "lavender",  "white","darkgreen", "green","orchid","cyan" ))
-```
-
-There are some good resources for your color adventures at <https://r-graph-gallery.com/ggplot2-color.html>!
-
-## GGplot also has many themes built in that change the underlying appearance of figures
+## ggplot has themes built in that change the underlying appearance of figures
 
 Let's look at some histograms with various themes:
 
@@ -273,12 +255,32 @@ ggplot(data = movies, mapping = aes(x=duration_minutes)) +
 
 See built-in theme options here: <https://ggplot2.tidyverse.org/reference/ggtheme.html>
 
-# Saving plots
+## Color Palette
 
-ggsave is the function for saving ggplots. It defaults to saving the last plot displayed, at a default size and resolution depending on the filetype
+Back to our line plots above - what if you wanted a different color palette for your figure?
 
 ```{r}
-ggsave("../images/plot.png")
+ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = parent_genres)) +   
+  geom_line() +    
+  scale_color_hue(h = c(180, 300))
+```
+
+Or to explicitly control the color of each line?
+
+```{r}
+ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = parent_genres)) +   
+  geom_line() +    
+  scale_color_manual(values=c("#69b3a2", "purple", "pink","red", "orange", "black","darkgrey", "lightblue", "yellow","violet", "lavender",  "white","darkgreen", "green","orchid","cyan" ))
+```
+
+There are some good resources for your color adventures at <https://r-graph-gallery.com/ggplot2-color.html>!
+
+# Saving plots
+
+`ggsave` is the function for saving ggplots. It defaults to saving the last plot displayed, at a default size and resolution depending on the filetype
+
+```{r}
+ggsave("../images/plot_default.png")
 ```
 
 ```{r}
