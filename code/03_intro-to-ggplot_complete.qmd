@@ -5,9 +5,15 @@ format: html
 editor: visual
 ---
 
-## 
+## Preface: Choosing a plot type to answer a question
+
+You may recall, one of our main questions is: what genre(s) of movies provide the best return on investment? In notebook 2, we ran some basic data analysis to arrive at an answer. However, now we turn to data visualization to see what else we can learn about the problem.
+
+Before we start visualizing, we should consider what type of plot to create. If our question involves analyzing which genres of films produce the greatest ROI (profit over budget or expenditures), what plot types can best help us answer that question. Let's review the
 
 ## 0. Setup
+
+First, let's import the packages we need:
 
 ```{r}
 library(tidyverse)
