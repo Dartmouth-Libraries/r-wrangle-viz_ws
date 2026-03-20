@@ -10,6 +10,7 @@ Please come with both R and R Studio– two distinct programs– installed.
 ## 2. Creator(s) / Author(s)
 
 Jeremy Mikecz, Emily Myers, Katie Owers Bonner
+*Research Facilitation, Dartmouth Libraries*
 
 ## 3. Designed for:
 
@@ -46,41 +47,44 @@ Upon completing the lessons offered here, attendees will be able to:
 * Export results, including modified datasets and plots
 
   
-## 6. Instructor(s) and Years Taught (if taught live)
+## 6. Instructor(s) and Years Taught
 
-Spring Intersession 2026 (March 23 and 25, 9-12:30) - Jeremy, Emily, Katie
+**Spring Intersession 2026 (March 23 and 25, 9-12:30)** - Jeremy, Emily, Katie
++ [Registration page for this workshop](https://libcal.dartmouth.edu/event/16535220) with description
++ Register for [other Reproducible Research Workshops](dartgo.org/RRADworkshops) @ Dartmouth
 
 
 ## 7. What to Expect
 
-We also want to set some expectations:
-1. All welcome - regardless of technical experience or comfort, status, etc. We will use **inclusive** language and try out best to adjust our pace to your needs. 
-2. In return, we ask for your patience - for technology workshops we cannot possibly anticipate everything that may go wrong.
-3. Communication is key
-1. Let us know if you are falling behind or don’t understand something; friendly interruptions welcome
-2. If you need individual help but don't want to slow down the group - Post-it system
-  + Pink = need help; stuck
-  + Blue = done, ready to go
-  + None = working
-3. We welcome discussions about how these methods could be adapted to your needs; don’t be afraid to ask why?
-4. In return we ask for your patience and understanding: this is our first time teaching this workshop - we don’t have every minute planned out, we will make mistakes and get stuck ourselves… but happy to talk and work through those problems together
-5. Materials for this workshop - [dartgo.org/sp26_r-workshop](dartgo.org/sp26_r-workshop) 
-  + includes objectives, schedule, facilities information, etc. in README document
+1. **All welcome!** - regardless of technical experience or comfort, status, etc. We will use **inclusive** language and try out best to adjust our pace to your needs. 
+2. **Patience & Communication Key** 
+  a. We will be patient with you and communicate our expectations
+  b. In return, we ask for your patience - for technology workshops we cannot possibly anticipate everything that may go wrong.
+3. **Need Help?**
+  + friendly interruptions welcome
+  + need individual help? - Post-it system
+    + Pink = need help; stuck
+    + Blue = done, ready to go
+    + None = working
+  + collaborate with support team (table-mates)
+4. **Ask / discuss "why?"** We welcome discussions about how these methods could be adapted to your needs; don’t be afraid to ask why?
+
+
+## 8. Overview of Materials
+
+ Materials for this workshop available on our workshop repository: [dartgo.org/sp26_r-workshop](dartgo.org/sp26_r-workshop) 
+  + includes 
   + materials for download: 
     + select the green CODE button and then download ZIP.
     + Find the downloaded zip file in your Downloads folder. To Unzip the folder: PC Users: right-click and select "Extract All" or "Unzip All"; Mac Users: simply open this folder and it will unzip
   + move downloaded folder to an appropriate place on your hard drive
 
-## 8. Overview of Materials - not completed!
-
-1. Notebooks / code
-2. Slides
-3. Other instructional materials
-4. Data
-5. Additional Resources
-  a. [Registration page for this workshop](https://libcal.dartmouth.edu/event/16535220) with description
-  b. Register for [other Reproducible Research Workshops](dartgo.org/RRADworkshops) @ Dartmouth
-  c. *R Resources...*
+This repository includes:
+1. **README.md**: objectives, schedule, facilities information, etc. in README document
+2. `code/` folder: R coding scripts and notebooks for this workhsop
+3. `data/`: data used for this workshop
+4. `slides/`
+5. `resources/`
 
 ## Need help? Contact us:
 
