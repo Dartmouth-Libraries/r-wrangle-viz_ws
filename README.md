@@ -1,16 +1,19 @@
 # Data Wrangling & Visualization in R: From Messy Data to Meaningful Figures
 
-## 1. Overview (Libcal Blurb)
+## 1. Overview 
 Good data visualizations can convey complicated concepts to a wide audience. Join us to learn how to transform data into interesting, informative visualizations using R. Over the course of two half-day interactive sessions, this workshop will guide you through importing data into R, wrangling data, and making plots and figures that help answer questions about the data. We will work with the same dataset throughout the workshop, so participants will get a feel for the research data lifecycle—from cleaning, to asking a research question, to producing final output.
 
 This workshop is novice-friendly, but assumes basic familiarity with R (reading in a dataset, loading a library). If you are not sure whether the workshop is a fit for your R experience, feel free to reach out to us at research.facilitation@dartmouth.edu.
 
-Please come with both R and R Studio– two distinct programs– installed. 
+Please come with both R and R Studio– two distinct programs – installed. 
 
 ## 2. Creator(s) / Author(s)
 
 Jeremy Mikecz, Emily Myers, Katie Owers Bonner
+
 *Research Facilitation, Dartmouth Libraries*
+
+Workshop brought to you by **Reproducible Research at Dartmouth** (a collaboration between the Dartmouth Libraries and Research Computing / ITC)
 
 ## 3. Designed for:
 
@@ -32,7 +35,7 @@ Day 2
 
 ## 4. What to Bring
 
-1. Laptop
+1. Laptop with R and R Studio installed ([instructions here](https://rstudio-education.github.io/hopr/))
 2. a laptop charger (if yours can't survive 3.5 hours)
 3. an open mind and willingness to learn
   
