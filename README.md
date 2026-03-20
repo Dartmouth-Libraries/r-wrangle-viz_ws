@@ -33,7 +33,8 @@ Day 2
 ## 4. What to Bring
 
 1. Laptop
-2. Willingness to learn and an open mind
+2. a laptop charger (if yours can't survive 3.5 hours)
+3. an open mind and willingness to learn
   
 ## 5. Learning Objectives
 
@@ -57,9 +58,13 @@ Upon completing the lessons offered here, attendees will be able to:
 ## 7. What to Expect
 
 1. **All welcome!** - regardless of technical experience or comfort, status, etc. We will use **inclusive** language and try out best to adjust our pace to your needs. 
+
 2. **Patience & Communication Key** 
+
   a. We will be patient with you and communicate our expectations
+
   b. In return, we ask for your patience - for technology workshops we cannot possibly anticipate everything that may go wrong.
+
 3. **Need Help?**
   + friendly interruptions welcome
   + need individual help? - Post-it system
@@ -67,21 +72,22 @@ Upon completing the lessons offered here, attendees will be able to:
     + Blue = done, ready to go
     + None = working
   + collaborate with support team (table-mates)
+  
 4. **Ask / discuss "why?"** We welcome discussions about how these methods could be adapted to your needs; don’t be afraid to ask why?
 
 
 ## 8. Overview of Materials
 
  Materials for this workshop available on our workshop repository: [dartgo.org/sp26_r-workshop](dartgo.org/sp26_r-workshop) 
-  + includes 
   + materials for download: 
     + select the green CODE button and then download ZIP.
     + Find the downloaded zip file in your Downloads folder. To Unzip the folder: PC Users: right-click and select "Extract All" or "Unzip All"; Mac Users: simply open this folder and it will unzip
   + move downloaded folder to an appropriate place on your hard drive
+  + Open R Studio, select **File** --> **New Project** --> **Existing Directory** --> select the workshop folder you just downloaded
 
 This repository includes:
 1. **README.md**: objectives, schedule, facilities information, etc. in README document
-2. `code/` folder: R coding scripts and notebooks for this workhsop
+2. `code/` folder: R coding scripts and notebooks for this workshop
 3. `data/`: data used for this workshop
 4. `slides/`
 5. `resources/`
