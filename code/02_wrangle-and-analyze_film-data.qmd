@@ -7,9 +7,22 @@ editor: visual
 
 ## Questions
 
-1.  What
+1.  From a practical research (not computational) perspective: How would/could you go about answering the question: what film genres offer the best return on investment?
 
-## interactive portions
+```         
+
+
+
+```
+
+2, With your team, as you continue exploring the film dataset, what other question would you like to answer?
+
+```         
+
+
+
+
+```
 
 ```{r}
 library(tidyverse)
@@ -24,11 +37,7 @@ df <- read_csv(here("data/movie_data.csv"))
 head(df)
 ```
 
-Opener and Closer - referring back to big research questions
-
-change filename - remove years and remove clean from the title of the file
-
-parent genres
+# \[TIDYVERSE INTRO\]
 
 ## Standardize Variable Names
 
@@ -145,7 +154,7 @@ genre_df <- df |>
 
 ```
 
-## Median ROI by genre
+### Median ROI by genre
 
 ```{r}
 genre_aggreg <- genre_df |>
@@ -193,8 +202,6 @@ The IQR is a natural companion to the median and tells you about consistency —
 head(genre_df)
 ```
 
-## 
-
 ```{r}
 colnames(genre_df)
 ```
@@ -208,3 +215,15 @@ genre_df <- genre_df |>
 ```{r}
 write_csv(genre_df, here("data/movies_split-by_parent-genre.csv"))
 ```
+
+## Closing
+
+## Experiment
+
+1.  We asked your team to come up with your own research question you would like to answer using the film dataset. With the time remaining, please do the following:
+    1.  Identify data wrangling steps you would need to complete to answer this question
+    2.  create a new notebook and carry out these data wrangling steps.
+
+##  
+
+1.  
