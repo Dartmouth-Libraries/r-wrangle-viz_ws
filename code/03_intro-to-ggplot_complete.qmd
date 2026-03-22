@@ -25,7 +25,7 @@ library(here)
 Now let's import this dataset:
 
 ```{r}
-movies <- read_csv(here("data/movie_data_dollars2.csv"))
+movies <- read_csv(here("data/movie_data_financial.csv"))
 ```
 
 ```{r}
@@ -125,6 +125,25 @@ ggplot(genre2020_df, aes(x=budget_mm, y=grossww_mm, color=parent_genres)) +
   scale_y_log10(labels = label_dollar(suffix = "M")) +
   annotation_logticks() 
   
+```
+
+```{r}
+pgenres <- c("comedy",
+             "drama", 
+             "romance")
+for (pgenre in pgenres) {
+  print(pgenre)
+  print(
+    ggplot(genre2020_df, aes(x=budget_mm, y=grossww_mm)) +
+      geom_point(size=2, color="gray", alpha=0.4) +
+      geom_point(data=genre2020_df |> filter(parent_genres==pgenre),
+                 color="blue", size=3, alpha = 0.6) +
+      geom_smooth(color="purple") +
+      scale_x_log10(labels = label_dollar(suffix = "M")) +
+      scale_y_log10(labels = label_dollar(suffix = "M")) +
+      annotation_logticks() 
+  )
+}
 ```
 
 ```{r}
