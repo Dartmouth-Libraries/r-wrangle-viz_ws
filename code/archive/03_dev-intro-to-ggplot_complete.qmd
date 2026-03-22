@@ -135,9 +135,9 @@ for (pgenre in pgenres) {
   print(pgenre)
   print(
     ggplot(genre2020_df, aes(x=budget_mm, y=grossww_mm)) +
-      geom_point(size=2, color="gray", alpha=0.4) +
+      geom_point(size=1, color="gray", alpha=0.4) +
       geom_point(data=genre2020_df |> filter(parent_genres==pgenre),
-                 color="blue", size=3, alpha = 0.6) +
+                 color="blue", size=2, alpha = 0.6) +
       geom_smooth(color="purple") +
       scale_x_log10(labels = label_dollar(suffix = "M")) +
       scale_y_log10(labels = label_dollar(suffix = "M")) +
@@ -216,11 +216,112 @@ p <- ggplot(low_budget, aes(
 ggplotly(p, tooltip = "text")
 ```
 
--   colors - parent genres
+## Risk-Return Scatterplot
 
--   smoothed_lines
+```{r}
 
--   facets?
+median_ROI_overall <- median(genre2020_df$profit_pct)
+print(median_ROI_overall)
+mean(genre2020_df$grossww_mm > 5 * genre2020_df$budget_mm)
+
+```
+
+```{r}
+
+```
+
+```{r}
+genre_summary <- genre2020_df |>
+  group_by(parent_genres) |>
+  summarize(
+    median_roi = median(profit_pct, na.rm = TRUE),
+    hit_rate   = mean(grossww_value > 5 * budget_value, na.rm = TRUE),
+    n          = n()
+  ) |>
+  filter(n >= 50)
+```
+
+```{r}
+# install.packages("ggrepel")
+library(ggrepel)
+
+ggplot(genre_summary, aes(x = median_roi, y = hit_rate, size = n, label = parent_genres)) +
+  geom_point(alpha = 0.7, color = "steelblue") +
+  geom_text_repel(size = 3) +          # from ggrepel package
+  scale_y_continuous(labels = scales::percent) +
+  # scale_x_continuous(labels = scales::percent) +
+  geom_hline(yintercept=.118, linetype="dashed") +
+  geom_vline(xintercept=13, linetype="dashed") +
+  labs(
+    title = "Which genres are worth the bet?",
+    x = "Median ROI", y = "Hit Rate (revenue > 5× budget)"
+  ) +
+  theme_minimal()
+
+```
+
+## Animated Scatter
+
+```{r}
+library(plotly)
+
+p <- genre2020_df |>
+  filter(!is.na(budget_value), !is.na(grossww_value), !is.na(year)) |>
+  ggplot(aes(x = budget_value, y = grossww_value, 
+             color = parent_genres, frame = year,
+             text = paste("Title:", title, "<br>Genre:", parent_genres))) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 5, intercept = 0,   # the "hit" threshold line
+              linetype = "dashed", color = "black") +
+  scale_x_log10(labels = scales::dollar_format()) +
+  scale_y_log10(labels = scales::dollar_format()) +
+  labs(title = "Budget vs. Worldwide Gross by Genre ({frame_time})",
+       x = "Production Budget", y = "Worldwide Gross") +
+  theme_minimal()
+
+ggplotly(p, tooltip = "text") |>
+  animation_opts(frame = 1000, redraw = FALSE)
+```
+
+## Diverging Bar Chart
+
+```{r}
+
+films_filtered <- genre2020_df |>
+  filter(!is.na(profit_pct), !is.na(parent_genres), parent_genres != "?",
+         !is.na(grossww_value), !is.na(budget_value)) |>
+  group_by(parent_genres) |>
+  filter(n() >= 50) |>
+  ungroup()
+
+genre_order <- films_filtered |>
+  group_by(parent_genres) |>
+  summarize(hit_rate = mean(grossww_value > 5 * budget_value, na.rm = TRUE)) |>
+  arrange(hit_rate) |>
+  pull(parent_genres)  
+
+films_filtered|>
+  mutate(outcome = case_when(
+    grossww_value > 5 * budget_value  ~ "Hit (>5× budget)",
+    grossww_value < budget_value      ~ "Flop (<1× budget)",
+    TRUE                              ~ "Middle"
+  )) |>
+  group_by(parent_genres, outcome) |>
+  summarize(n = n()) |>
+  mutate(pct = n / sum(n),
+         parent_genres = factor(parent_genres, levels=genre_order)) |>
+  ggplot(aes(x = parent_genres, y = pct, fill = outcome)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Hit (>5× budget)" = "#2ecc71", 
+                                "Middle"           = "#bdc3c7",
+                                "Flop (<1× budget)"= "#e74c3c")) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Outcomes by genre", x = NULL, y = "Share of films") +
+  theme_minimal()
+```
+
+-   
 
 -   theme_minimal? basic preset themes
 
