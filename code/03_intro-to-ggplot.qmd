@@ -157,3 +157,270 @@ We can also change the color of all points by setting color as a constant:
 ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
   geom_point(size=1, alpha=0.2, color="steelblue4")
 ```
+
+We can also "map" color to a data variable (rather than a constant like "blue"):
+
+```{r}
+ggplot(movies, aes(x=budget_mm, y=grossww_mm, color=mpa)) +
+  geom_point(size=1, alpha=0.2)
+```
+
+It's still hard to discern any real patterns. Let's ignore the "mpa" ratings for now and explore overall trends (and, later, we'll have to bring genre in).
+
+```{r}
+ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point(size=1, alpha=0.2, color="steelblue4") +
+  geom_smooth(color="purple") 
+```
+
+We could also isolate the distribution of data for both budget and gross revenue. We could create separate histograms for each.
+
+Or we can add them to the margins of our scatterplot using the R library **ggExtra** and its function [**ggMarginal()**](https://r-graph-gallery.com/277-marginal-histogram-for-ggplot2.html)**:**
+
+```{r}
+#install.packages("ggExtra")
+library(ggExtra)
+
+p <- ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point(size=1, alpha=0.2, color="steelblue4") +
+  geom_smooth(color="purple")
+
+ggMarginal(p, type='histogram')
+```
+
+Notice the number of films concentrated near the bottom left. This is called an [exponential distribution](https://blog.dailydoseofds.com/p/nine-most-important-distributions) or log-normal or power-law distribution. We should, thus represent both axes using a logarithmic scale:
+
+```{r}
+library(scales)
+
+log_p <- ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point(size=1, alpha=0.2, color="steelblue4") +
+  geom_smooth(color="purple") +
+  scale_x_log10(labels = label_dollar(suffix = "M")) +
+  scale_y_log10(labels = label_dollar(suffix = "M")) +
+  annotation_logticks()
+
+ggMarginal(log_p, type='histogram')
+```
+
+It would be helpful to compare this curved line with a line indicating profit. Any movie that made revenue than it cost to make made a profit. So, how do we represent that?
+
+```{r}
+median_ROI_overall <- median(movies$profit_pct)
+median_ROI_overall
+```
+
+```{r}
+log_p <- ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point(size=1, alpha=0.2, color="steelblue4") +
+  geom_smooth(color="purple") +
+  geom_abline(intercept = 0, slope = 1, color = "gray", linetype = "dashed", size = 1) +
+  geom_abline(intercept = 0, slope = 1.59, color = "red", linetype = "dashed", size = 1.3) +
+  scale_x_log10(labels = label_dollar(suffix = "M")) +
+  scale_y_log10(labels = label_dollar(suffix = "M")) +
+  annotation_logticks()
+
+ggMarginal(log_p, type='histogram')
+```
+
+```{r}
+# install.packages("viridis")
+library(viridis)
+
+log_p <- ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_density_2d_filled() +
+  geom_point(size=1, alpha=0.2, color="pink") +
+  geom_smooth(color="purple") +
+  geom_abline(intercept = 0, slope = 1, color = "gray", linetype = "dashed", size = 1) +
+  geom_abline(intercept = 0, slope = 1.59, color = "red", linetype = "dashed", size = 1.3) +
+  scale_color_viridis() +
+  scale_x_log10(labels = label_dollar(suffix = "M")) +
+  scale_y_log10(labels = label_dollar(suffix = "M")) +
+  annotation_logticks()
+
+ggMarginal(log_p, type='histogram')
+```
+
+## Adding in genres
+
+If only one genre was assigned to each movie, then this next step would be easy. We could work with this same `movies` dataframe, representing genre by color or in different facets. However, for our movies dataset, most movies have been assigned multiple genres.
+
+Fortunately, we split out this genre data into separate row in notebook 02. Let's load that version of the dataset:
+
+```{r}
+genre_df <- read_csv(here("data/movies_split-by_parent-genre.csv"))
+```
+
+```{r}
+# alternative to using head() or tail()
+sample_n(genre_df, 10)
+```
+
+With this dataset we could reproduce the same plot as before, but this time represent genre by color.
+
+Remember, however, each movie is being counted multiple times. Thus, a film assigned 5 genres is represented by 5 points.
+
+```{r}
+log_p <- ggplot(sample_frac(genre_df, .10), aes(x=budget_mm, y=grossww_mm, color=parent_genres)) +
+  geom_point(size=2, alpha=0.5) +
+  geom_smooth(color="purple") +
+  geom_abline(intercept = 0, slope = 1, color = "gray", linetype = "dashed", size = 1) +
+  geom_abline(intercept = 0, slope = 1.59, color = "red", linetype = "dashed", size = 1.3) +
+  scale_x_log10(labels = label_dollar(suffix = "M")) +
+  scale_y_log10(labels = label_dollar(suffix = "M")) +
+  annotation_logticks()
+
+ggMarginal(log_p, type='histogram')
+```
+
+```{r}
+pgenres <- c(
+  "act-ad",
+  "comedy",
+  "documentary",
+  "drama", 
+  "horror",
+  "mystery",
+  "romance",
+  "scifi",
+  "thriller"
+  )
+for (pgenre in pgenres) {
+  print(pgenre)
+  print(
+    ggplot(genre_df |> filter(parent_genres == pgenre), aes(x=budget_mm, y=grossww_mm)) +
+      geom_density_2d_filled() +
+      # geom_point(size=1, color="gray", alpha=0.4) +
+      #geom_point(data=genre_df |> filter(parent_genres==pgenre),
+      #           color="blue", size=2, alpha = 0.6) +
+      geom_abline(intercept = 0, slope = 1, color = "gray", linetype = "dotted", size = 0.75) +
+      geom_smooth(color="turquoise") +
+      geom_smooth(data=genre_df, color='white', linetype="dashed", se=FALSE) +
+      scale_x_log10(labels = label_dollar(suffix = "M")) +
+      scale_y_log10(labels = label_dollar(suffix = "M")) +
+      annotation_logticks() + 
+      labs(
+        title=sprintf("Density Plot: Gross Revenue vs. Budget for %s Films, 2010-2015", pgenre)
+      )
+  )
+}
+```
+
+## ROI Distribution by Genre (Box Plot)
+
+A bar chart of medians hides the spread. Use a box plot to see the **full distribution** of ROI across genres, inc)luding variability and outliers.
+
+```{r}
+ggplot(genre_df, aes(x = reorder(parent_genres, profit_pct, median), y = profit_pct)) +
+  geom_jitter(size=0.4, width=0.3, alpha=0.3, aes(color=parent_genres)) +
+  geom_boxplot(outlier.alpha = 0.2, outlier.shape = NA) +
+  coord_flip() +
+  labs(
+    title = "Distribution of ROI by Genre",
+    x     = "Genre",
+    y     = "ROI (%)"
+  )
+
+
+```
+
+This is skewed by a few extreme values. Let's reduce the x axis extent:
+
+```{r}
+ggplot(genre_df, aes(x = reorder(parent_genres, profit_pct, median), y = profit_pct)) +
+  geom_jitter(size=0.4, width=0.3, alpha=0.3, aes(color=parent_genres)) +
+  geom_boxplot(outlier.alpha = 0.2, outlier.shape = NA, fill=NA) +
+  coord_flip() +
+  ylim(-100, 3000) +
+  
+  labs(
+    title = "Distribution of ROI by Genre",
+    x     = "Genre",
+    y     = "ROI (%)"
+  )
+
+ggsave(here("results/movie-genres_boxplot-roi.png"))
+
+```
+
+## Risk-Return Scatterplot
+
+```{r}
+# calculate median percent profit
+median_ROI_overall <- median(genre_df$profit_pct)
+print(median_ROI_overall)
+
+# calculate percent of films to gross 5x their budget
+mean_hit_rate <- mean(genre_df$grossww_mm >= 5 * genre_df$budget_mm)
+print(mean_hit_rate)
+```
+
+Create an aggregated dataframe. Films are aggregated by `parent_genre` and data is summarized by calculating the median ROI (or percent profit) of films and the "hit rate" (% of films that earn 5x their budget) for each parent genre.
+
+```{r}
+genre_summary <- genre_df |>
+  group_by(parent_genres) |>
+  summarize(
+    median_roi = median(profit_pct, na.rm = TRUE),
+    hit_rate   = mean(grossww_value >= 5 * budget_value, na.rm = TRUE),
+    n          = n()
+  ) |>
+  filter(n >= 50)
+
+genre_summary
+```
+
+```{r}
+# install.packages("ggrepel")
+library(ggrepel)
+
+ggplot(genre_summary, aes(x = median_roi, y = hit_rate, size = n, label = parent_genres)) +
+  geom_point(alpha = 0.7, color = "steelblue") +
+  geom_text_repel(size = 3) +          # from ggrepel package
+  scale_y_continuous(labels = scales::percent) +
+  # scale_x_continuous(labels = scales::percent) +
+  geom_hline(yintercept=mean_hit_rate, linetype="dashed") +
+  geom_vline(xintercept=median_ROI_overall, linetype="dashed") +
+  labs(
+    title = "Which genres are worth the bet?",
+    x = "Median ROI", y = "Hit Rate (revenue > 5× budget)"
+  ) +
+  theme_minimal()
+```
+
+## Diverging Bar Chart
+
+```{r}
+films_filtered <- genre_df |>
+  filter(!is.na(profit_pct), !is.na(parent_genres), parent_genres != "?",
+         !is.na(grossww_value), !is.na(budget_value)) |>
+  group_by(parent_genres) |>
+  filter(n() >= 50) |>
+  ungroup()
+
+genre_order <- films_filtered |>
+  group_by(parent_genres) |>
+  summarize(hit_rate = mean(grossww_value > 5 * budget_value, na.rm = TRUE)) |>
+  arrange(hit_rate) |>
+  pull(parent_genres)  
+
+films_filtered|>
+  mutate(outcome = case_when(
+    grossww_value > 5 * budget_value  ~ "Hit (>5× budget)",
+    grossww_value < budget_value      ~ "Flop (<1× budget)",
+    TRUE                              ~ "Middle"
+  )) |>
+  group_by(parent_genres, outcome) |>
+  summarize(n = n()) |>
+  mutate(pct = n / sum(n),
+         parent_genres = factor(parent_genres, levels=genre_order)) |>
+  ggplot(aes(x = parent_genres, y = pct, fill = outcome)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Hit (>5× budget)" = "#2ecc71", 
+                                "Middle"           = "#bdc3c7",
+                                "Flop (<1× budget)"= "#e74c3c")) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Outcomes by genre", x = NULL, y = "Share of films") +
+  theme_minimal()
+```
