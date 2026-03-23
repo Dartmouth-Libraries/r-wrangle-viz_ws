@@ -18,7 +18,7 @@ library(here)
 movies <- read_csv("../data/movie_data_financial.csv")
 ```
 
-# Exploring Critic vs Public Opinion
+# Scatterplots, revisited: Exploring Critic vs Public Opinion
 
 Let's come back to another question from our first day: (**How) do critical and popular opinions about movies diverge?**
 
@@ -34,9 +34,30 @@ Reminder of what these variables look like from our exploratory analysis:
 summary(movies[, c("rating", "meta_score")])
 ```
 
+A few notes
+
+-   Different scales
+
+-   Missing values (NA = 332) in meta_score
+
+-   Difference in central tendency (mean and median) values \~ 64 (public) vs 55 (critic) rating
+
+## Let's graph it!
+
+Let's do a quick scatterplot to see if anything jumps out at us. We'll create a plot and assign it to the object name 'p':
+
 ```{r}
-ggplot(data =movies, mapping = aes(x = meta_score, y=rating)) +
-  geom_point() + 
+p <- ggplot(data = movies, 
+       mapping = aes(x = meta_score, y=rating)) +
+  geom_point() 
+
+p
+```
+
+Let's fix the labels
+
+```{r}
+p + 
   labs(
     title = "Critic vs public movie ratings",
     x = "Critic Score (meta_score)",
@@ -49,14 +70,11 @@ ggplot(data =movies, mapping = aes(x = meta_score, y=rating)) +
 Let's use an option called `facet_wrap` that splits up our plot by a factor (categorical variable) in the data. Let's use the other kind of rating - MPA.
 
 ```{r}
-ggplot(data =movies, mapping = aes(x = meta_score, y=rating)) +
-  geom_point()  + 
-  labs(
-  x = "meta_score (critics)",
-  y = "rating (the public)"
-  ) +
+p +
   facet_wrap(~mpa)
 ```
+
+Note here: Because we didn't overwrite p with the labels we added above, they aren't showing here.
 
 ## What about by genre?
 
@@ -74,17 +92,19 @@ movies_genre |>
 ```
 
 ```{r}
-table(movies_genre$parent_genres)
+movies_genre |> 
+  count(parent_genres, sort = TRUE) 
 ```
 
-And now do a figure where we facet by parent_genre:
+And now do a figure where we facet by parent_genre. Note we can't use the p plot we built above, because we're working with a different dataset now!
 
 ```{r}
-ggplot(data =movies_genre, mapping = aes(x = meta_score, y=rating)) +
+ggplot(data = movies_genre, 
+       mapping = aes(x = meta_score, y=rating)) +
   geom_point() + 
   labs(
-  x = "meta_score (critics)",
-  y = "rating (the public)"
+    x = "Critic Score (meta_score)",
+    y = "Public Score (rating)"
   )  +
   facet_wrap(~parent_genres)
 ```
@@ -112,8 +132,11 @@ movies <- movies |>
   mutate(low_votes = ifelse(votes<10000,"Yes","No"))
 ```
 
+Let's add that low_votes as a factor determining the color of each data point:
+
 ```{r}
-ggplot(data =movies, mapping = aes(x = meta_score, y=rating, 
+ggplot(data = movies, 
+       mapping = aes(x = meta_score, y=rating, 
                                color = as.factor(low_votes))) +
   geom_point() + 
   labs(
@@ -123,32 +146,40 @@ ggplot(data =movies, mapping = aes(x = meta_score, y=rating,
     ) 
 ```
 
-Let's make two visual tweaks here - label the legend better and change the color palette:
+Let's make a few visual tweaks here - label the legend better, change the color palette, and make the points semi-transparent:
 
 ```{r}
 ggplot(data =movies, mapping = aes(x = meta_score, y=rating, 
                                color = as.factor(low_votes))) +
-  geom_point() + 
+  geom_point(alpha = 0.5) + # transparency
   labs(
     title = "Critic vs public movie ratings",
     x = "Critic Score",
     y = "Public Score",
-    color = "<10k votes?"
+    color = "<10k votes?" # label for the legend
     ) +
-  scale_color_manual(values = c("Yes" = "red", "No" = "blue")) 
+  scale_color_manual(values = c("Yes" = "red", "No" = "blue")) # manually setting the color for each value of low_votes
 
 
 ```
 
-What other steps might you take to answer this question about the public vs critical opinion of movies?
+What other steps might you take to answer this question about the public vs critical opinion of movies? Is there anything you want to explore?
 
 # Boxplots and violin plots
 
 What if we wanted to look instead at the values of rating (the public score) by parent_genre?
 
 ```{r}
-ggplot(movies_genre, mapping = aes(x = parent_genres, y = rating)) +
-  geom_boxplot() + 
+box <- ggplot(movies_genre, mapping = aes(x = parent_genres, y = rating)) +
+  geom_boxplot() 
+
+box
+```
+
+You can't read those parent_genre labels - let's fix that:
+
+```{r}
+box + 
   theme(
   axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
   )
@@ -159,11 +190,13 @@ Take a minute to explore the theme axis text commands - what happens when you ch
 You can also sort the data so that the histograms are arranged according to their median value:
 
 ```{r}
-ggplot(movies_genre, mapping = aes(x = fct_reorder(parent_genres, -rating, .fun=median), y = rating)) +      
+box_sort <- ggplot(movies_genre, mapping = aes(x = fct_reorder(parent_genres, -rating, median), y = rating)) +      
   geom_boxplot() +       
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)   
         )
+
+box_sort
 ```
 
 This conveys a lot of information! What might be missing?
@@ -171,11 +204,7 @@ This conveys a lot of information! What might be missing?
 Let's add points to show how many movies were in each boxplot as well as the summary values.
 
 ```{r}
-ggplot(movies_genre, mapping = aes(x = fct_reorder(parent_genres, -rating, .fun=median), y = rating)) +
-  geom_boxplot(fill = "darkgrey")  + 
-  theme(
-  axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
-  ) +
+box_sort +
   geom_jitter(color="blue", size=0.4, alpha=0.3)
 ```
 
@@ -189,7 +218,7 @@ ggplot(movies_genre, mapping = aes(x = parent_genres, y = rating)) +
   )
 ```
 
-# Line plots and changing aesthetics
+# Line plots
 
 What if you were curious about the number of movies in each parent genre by year?
 
@@ -211,9 +240,17 @@ ggplot(genre_summary_data, aes(x=year, y=count,
 
 There are some interesting patterns here! What do you see?
 
+-   That green line is always on top
+
+-   2020 crash in film numbers
+
+-   2025 crash in film numbers
+
 There is also a lot of information here, and it's a little hard to interpret information about the genres themselves with so many lines and the current color scheme.
 
-Another visual tool is highlighting a single (or few) line(s) of interest. Say we were interested in trends in comedies. We could make all the other lines grey and leave comedies red to show them in context while also highlighting the category of interest:
+## Changing the color palette
+
+One visual tool is highlighting a single (or few) line(s) of interest. Say we were interested in trends in comedies. We could make all the other lines grey and leave comedies red to show them in context while highlighting the category of interest:
 
 ```{r}
 ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = parent_genres)) +
@@ -221,9 +258,7 @@ ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = p
   geom_line(data = subset(genre_summary_data, parent_genres == "comedy"), color = "red")
 ```
 
-## Change the color Palette
-
-What if you wanted to keep all lines, but use a different color palette for your figure?
+What if you wanted to use a different color palette for your figure? Say cool tones
 
 ```{r}
 ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = parent_genres)) +      
@@ -239,11 +274,11 @@ ggplot(genre_summary_data, aes(x=year, y=count, group = parent_genres, color = p
   scale_color_manual(values=c("#69b3a2", "purple", "pink","red", "orange", "black","darkgrey", "lightblue", "yellow","violet", "lavender",  "white","darkgreen", "green","orchid","cyan" ))
 ```
 
-There are some good resources for your color adventures at <https://r-graph-gallery.com/ggplot2-color.html>!
+There are good resources for your color adventures at <https://r-graph-gallery.com/ggplot2-color.html> and <https://ggplot2-book.org/scales-colour.html>!
 
-## ggplot also built-in themes that change the underlying appearance of figures
+## Themes
 
-Let's look at some histograms with various themes:
+ggplot also has built-in themes that change the underlying appearance of figures. Let's look at some histograms with various themes:
 
 ```{r}
 ggplot(data = movies, mapping = aes(x=duration_minutes)) +      
