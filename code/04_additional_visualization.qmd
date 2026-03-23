@@ -116,7 +116,8 @@ ggplot(data = movies_genre,
 ```{r}
 options(scipen=999)
 ggplot(data = movies, mapping = aes(x=votes)) +      
-  geom_histogram() 
+  geom_histogram() +
+  scale_x_continuous(labels = scales::label_comma()) # note the ability to add a thousands separator
 ```
 
 That's a lot of movies with not a lot of votes! Let's look more into it:
@@ -321,13 +322,13 @@ ggsave("../results/plot_highres.jpeg", dpi=600)
 You can also assign `ggsave()` a specific plot to save:
 
 ```{r}
-p <- ggplot(data = movies, mapping = aes(x=duration_minutes)) +      
+fig_one <- ggplot(data = movies, mapping = aes(x=duration_minutes)) +      
   geom_histogram(binwidth=10, fill ="red") +      
   xlim(50,max(movies$duration_minutes)) +
   theme_bw()
 
 
-ggsave("../results/plot_red.png", p)
+ggsave("../results/figure_one.png", fig_one)
 ```
 
 # Reflection
