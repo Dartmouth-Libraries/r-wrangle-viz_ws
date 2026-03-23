@@ -1,0 +1,159 @@
+---
+title: "Introduction to GGplot"
+author: "Jeremy Mikecz"
+format: html
+editor: visual
+---
+
+## Preface: Choosing a plot type to answer a question
+
+You may recall, one of our main questions is: what genre(s) of movies provide the best return on investment? In notebook 2, we ran some basic data analysis to arrive at an answer. However, now we turn to data visualization to see what else we can learn about the problem.
+
+Before we start visualizing, we should consider what type of plot to create. If our question involves analyzing which genres of films produce the greatest ROI (profit over budget or expenditures), what plot types can best help us answer that question. Let's review [Data to Viz](https://www.data-to-viz.com) and [R Graph Gallery](https://r-graph-gallery.com/).
+
+```         
+```
+
+But, what if you want to mix some elements of different plots? Create a plot type entirely? What if you want to create something like ?? unique "[Nobel Prizes and laureates, 1901-2012](https://i0.wp.com/www.themarginalian.org/wp-content/uploads/2012/11/nobel_large.jpg?ssl=1)" graphic? Or this "[Upvotes are Beautiful](https://eadn-wc04-16734788.nxedge.io/wp-content/uploads/2020/03/plot.png)" visualization?
+
+Data visualization experts and software developers recognized that to enhance customization, we should not confine ourselves to preset plot types. Rather, we should view data visualization as a language with its own vocabulary and grammar.
+
+Leland Wilkinson defined the "[Grammar of Graphics](https://link.springer.com/chapter/10.1007/0-387-28695-0_1) - in a book with that name - as a way to identify the smallest reproducible components of data visualizations. This **grammar of graphics** inspired the creators of R's most popular data visualization package **ggplot**, where the "gg" stands for "grammar of graphics".
+
+### 0.2. The ggplot2 library
+
+To create visualizations in R we will use the popular **ggplot** package.
+
+To learn more about ggplot outside this lesson, see:
+
+-   ggplot2 [cheat sheet](https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf)
+
+-   ggplot2 library [home page](https://ggplot2.tidyverse.org/) (with links to suggested tutorials / learning materials)
+
+-   ggplot2 book: Wickham, [*ggplot2: Elegant Graphics for Data Analysis*](https://ggplot2-book.org/)(3rd edition).
+
+-   Specific Visualization tutorials:
+
+    -   ggplot2 cookbook: Chang, [*R Graphics Cookbook*](https://r-graphics.org/) *(2024).*
+
+    -   [*R Graph Gallery*](https://r-graph-gallery.com/)
+
+-   ggplot extensions: <https://exts.ggplot2.tidyverse.org/gallery/>
+
+### 0.3. Grammar of Graphics
+
+The "gg" in ggplot stands for **Grammar of Graphics**. GGplot was developed by Hadley Wickham following the Grammar of Graphics model. The Grammar of Graphics approach seeks to reduce visualizations to their simplest components. Applying this approach to computational visualizations allows for maximum customization and flexibility.
+
+-   CU-Boulder Coursera course video on [Grammar of Graphics](https://www.youtube.com/watch?v=RCaFBJWXfZc)
+
+-   Hadley Wickham, ["A Layered Grammar of Graphics"](https://vita.had.co.nz/papers/layered-grammar.html) in *Journal of Computational and Graphical Statistics* (2010).
+
+-   [Cornell course guide](https://info5940.infosci.cornell.edu/notes/dataviz/grammar-of-graphics/)
+
+-   Wickham, [*ggplot2: Elegant Graphics for Data Analysis*](https://ggplot2-book.org/)(3rd edition)
+
+    -   especially Introduction and "The Grammar" chapters (Chapters 13-17)
+
+\[more\]
+
+So, we can use ggplot to create conventional plot types like line, bar, and scatter plot, however you do that not by calling specific functions for those plot types. Instead, you call functions to create the components of these plot types: to create not just the lines, bars, and points of the graphics but also the axes, labels, etc.
+
+Take a look again at the Nobel Prizes graphic (linked above). What are the different individual graphical components you can identify?
+
+## 0. Setup
+
+First, let's import the packages we need:
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+## 1. Import Data
+
+Now let's import this dataset:
+
+```{r}
+movies <- read_csv(here("data/movie_data_financial.csv"))
+```
+
+```{r}
+colnames(movies)
+
+```
+
+## 2. Creating plots with ggplot
+
+**Key Components of "Grammar of Graphics" plots**
+
+Plot = Data + Mapping (how data variables are to be visualized)
+
+Five mapping components:
+
+| Component | Description |
+|------------------------------------|------------------------------------|
+| layer | includes **geoms** (geometric elements visible in the plot like points, lines, polygons, etc.) and **stats** (statistical transformations that summarize the data, simplifying it for visualization; i.e. binning or counting observations to make a histogram, or fitting a linear model) |
+| scale | maps data values to visual variables like color, shape, and size |
+| coord | describes how data will be placed spatially and what coordinate system will be used |
+| facet | describes how to split data and display it in "small multiples" |
+| theme | control stylistic choices such as font size and color palettes |
+
+The conventional syntax to plot with ggplot is:
+
+```         
+ggplot(
+  data=dataset_name,
+  aes(columns assigned to particular visual variables such as x coord, y coord, color fill, color outline, etc.)
+  ) +
+  geom_name(any_additional_arguments)
+```
+
+Thus, to create a histogram, ....
+
+## 3. Choosing a Plot Type
+
+To examine the issue of which genres of films provide the best return on investment, we first need to answer some preliminary questions:
+
+1.  do we want to visualize the relationship between the two continuous numerical variables (budget/expenses vs. revenues) that comprise any calculation of profit? Or should we focus on one continuous variable calculated from those two: the percent margin of profit?
+2.  do we want to visualize all the full dataset? Represent all films as in a scatterplot where one dot is shown for each film? Or do we want to aggregate the dataset by genre (as in a bar plot where each bar represent a total count or statistical metric generated with the creation of the aggregated dataset)?
+3.  Do you want to examine change over time?
+
+Fortunately, we don't need to definitively answer all these questions ahead of time. ggplot makes creating exploratory visualizations relatively easy (with some practice).
+
+## 4. Scatterplots
+
+Let's first create a scatterplot to plot all films by budget and gross revenue. To create the most basic scatterplot, we'll need to define the following components:
+
+1.  **data**: the dataset we are using
+2.  **aesthetic mappings** between data and visual variables: i.e.
+    1.  data variable represented on the x axis
+    2.  data variable represented on the y axis
+3.  **geom**: which indicates how to visually represent each observation
+
+Thus, the most basic scatterplot would be something like this:
+
+```{r}
+ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point()
+```
+
+It's valuable to see the distribution of this data. However, this plot isn't useful at all for answer our question. What changes do we need to make?
+
+```         
+
+
+```
+
+One problem with this first plot is that there is (are?) too much data to make sense of visually this way. This is a common data viz issue known as "overplotting." The Data to Viz [*Caveats*](https://www.data-to-viz.com/caveats.html)page describes some solutions to [overplotting](https://www.data-to-viz.com/caveat/overplotting.html) with scatterplots. The first two solutions allows the creator to more clearly show all points: reducing the size of the points and increasing their transparency:
+
+```{r}
+ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point(size=1, alpha=0.2)
+```
+
+We can also change the color of all points by setting color as a constant:
+
+```{r}
+ggplot(movies, aes(x=budget_mm, y=grossww_mm)) +
+  geom_point(size=1, alpha=0.2, color="steelblue4")
+```

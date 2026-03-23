@@ -9,7 +9,16 @@ editor: visual
 
 You may recall, one of our main questions is: what genre(s) of movies provide the best return on investment? In notebook 2, we ran some basic data analysis to arrive at an answer. However, now we turn to data visualization to see what else we can learn about the problem.
 
-Before we start visualizing, we should consider what type of plot to create. If our question involves analyzing which genres of films produce the greatest ROI (profit over budget or expenditures), what plot types can best help us answer that question. Let's review the
+Before we start visualizing, we should consider what type of plot to create. If our question involves analyzing which genres of films produce the greatest ROI (profit over budget or expenditures), what plot types can best help us answer that question. Let's review [Data to Viz](https://www.data-to-viz.com) and [R Graph Gallery](https://r-graph-gallery.com/).
+
+```         
+```
+
+But, what if you want to mix some elements of different plots? Create a plot type entirely? Data visualization experts and software developers recognized that to enhance customization, we should not confine ourselves to preset plot types. Rather, we should view data visualization as a languages with its own vocabulary and grammar.
+
+Leland Wilkinson defined the "[Grammar of Graphics](https://link.springer.com/chapter/10.1007/0-387-28695-0_1) - in a book with that name - as a way to identify the smallest reproducible components of data visualizations. This **grammar of graphics** inspired the creators of R's most popular data visualization package **ggplot**, where the "gg" stands for "grammar of graphics".
+
+\[more\]
 
 ## 0. Setup
 
@@ -179,13 +188,16 @@ A bar chart of medians hides the spread. Use a box plot to see the **full distri
 
 ```{r}
 ggplot(genre2020_df, aes(x = reorder(parent_genres, profit_pct, median), y = profit_pct)) +
-  geom_boxplot(outlier.alpha = 0.2) +
+  geom_boxplot(outlier.alpha = 0.2, outlier.shape = NA) +
+  geom_jitter(size=0.4, width=0.3, alpha=0.3, aes(color=parent_genres)) +
   coord_flip() +
   labs(
     title = "Distribution of ROI by Genre",
     x     = "Genre",
     y     = "ROI (%)"
   )
+
+ggsave(here("results/movie-genres_boxplot-roi.png"))
 ```
 
 ## High-Return Low-Budget Films (Scatter Plot, Interactive)

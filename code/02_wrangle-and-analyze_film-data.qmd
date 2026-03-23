@@ -11,13 +11,11 @@ editor: visual
 
 ```         
 
-
 ```
 
 2, With your team, as you continue exploring the film dataset, what other question would you like to answer?
 
 ```         
-
 
 
 ```
@@ -395,7 +393,7 @@ Let's do the simplest approach: one row per film / genre (no weighting).
 
 ```
 
-## separate_rows(): 
+## separate_rows():
 
 ```{r}
 genre_df <- df |>
