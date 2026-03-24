@@ -49,12 +49,14 @@ Let's do a quick scatterplot to see if anything jumps out at us. We'll create a 
 ```{r}
 p <- ggplot(data = movies, 
        mapping = aes(x = meta_score, y=rating)) +
-  geom_point() 
+        geom_point() 
 
 p
 ```
 
-Let's fix the labels in case you, like me, can never remember which is which. Because we've already saved p, all we need to do is add the label text to it:
+Notice that ggplot automatically excluded the 332 rows with missing meta_score values.
+
+Let's fix the labels in case you, like me, can never remember which is which. Because we've already saved the ggplot object p, we can just add the labels to it:
 
 ```{r}
 p + 
@@ -84,7 +86,8 @@ Note: Because we didn't overwrite p with the labels we added above, they aren't 
 
 ```{r}
 options(scipen=999)
-ggplot(data = movies, mapping = aes(x=votes)) +      
+ggplot(data = movies, 
+       mapping = aes(x=votes)) +      
   geom_histogram() +
   scale_x_continuous(labels = scales::label_comma()) # note the ability to add a thousands separator!
 ```
@@ -118,7 +121,9 @@ ggplot(data = movies,
 
 ## Legends
 
-This is the first legend we've gotten! ggplot is pretty good about automatically deciding when a legend is needed. Let's make a few tweaks to it - label it better, move it inside the plot, and reverse the Yes/No entries.
+This is the first legend we've gotten! ggplot is pretty good about automatically deciding when a legend is needed.
+
+Let's make a few tweaks to it to explore how legend controls work. We'll label it better, move it inside the plot, and reverse the Yes/No entries.
 
 ```{r}
 ggplot(data =movies, mapping = aes(x = meta_score, y=rating, 
@@ -181,7 +186,7 @@ box <- ggplot(movies_genre, mapping = aes(x = parent_genres, y = rating)) +
 box
 ```
 
-You can't read those parent_genre labels - let's fix that:
+You can't read the parent_genre labels - let's fix that:
 
 ```{r}
 box + 
@@ -195,7 +200,9 @@ Take a minute to explore the `theme(axis.text.x = ...)` arguments - what happens
 You can also sort the data so that the histograms are arranged according to their median value:
 
 ```{r}
-box_sort <- ggplot(movies_genre, mapping = aes(x = fct_reorder(parent_genres, -rating, median), y = rating)) +      
+box_sort <- ggplot(movies_genre, 
+                   mapping = aes(x = fct_reorder(parent_genres, -rating, median), # sort the  variable parent_genres (as a factor) by decreasing median rating
+                                 y = rating)) +      
   geom_boxplot() +       
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)   
@@ -206,14 +213,14 @@ box_sort
 
 This conveys a lot of information! What might be missing?
 
-Let's add points to show how many movies were in each boxplot as well as the summary values.
+Let's add points to show how many movies were in each genre as well as the summary values.
 
 ```{r}
 box_sort +
   geom_jitter(color="blue", size=0.4, alpha=0.3)
 ```
 
-What about another way of looking at this data? Violin plots show the shape of the data distribution. They're actually vertically mirrored histograms!
+What about another way of looking at this data? Violin plots show the shape of the data distribution. They're actually vertically mirrored histograms! They combine features of point and boxplot ddata into an informative graphic.
 
 ```{r}
 ggplot(movies_genre, mapping = aes(x = parent_genres, y = rating)) +
